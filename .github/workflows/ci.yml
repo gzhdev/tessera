@@ -17,7 +17,7 @@ jobs:
     name: fmt / clippy / test / 依赖方向
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: 安装 Rust
         uses: dtolnay/rust-toolchain@stable
@@ -50,7 +50,7 @@ jobs:
     name: WASM Component Model 工具链冒烟
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: 安装 Rust 与 wasm32-wasip2 target
         uses: dtolnay/rust-toolchain@stable
