@@ -124,12 +124,18 @@ impl<S: Subscriber> Filter<S> for PluginLogRateLimit {
 
 impl PluginLogRateLimit {
     /// 丢弃警告以与 fmt 层同构的 JSON 行旁路写入。
+    ///
+    /// plugin_id 必须经 serde_json 序列化而非 `escape_default`：
+    /// 后者对非 ASCII 产出 `\u{...}` 花括号形式（Rust 语法，非法 JSON）。
+    /// 当前插件 id 虽被 §9 限定为 ASCII 反向域名，这里防御性保证整行可被解析。
     fn write_drop_warning(&self, plugin_id: &str) {
         let Some(sink) = &self.sink else { return };
+        // to_string 产出含首尾引号的完整 JSON 字符串，模板中不再重复加引号
+        let plugin_id_json = serde_json::to_string(plugin_id).expect("字符串序列化不会失败");
         let line = format!(
-            "{{\"timestamp\":\"{}\",\"level\":\"WARN\",\"target\":\"tessera::observability\",\"fields\":{{\"rate_limited_plugin\":\"{}\",\"limit\":{},\"message\":\"插件日志超过每秒 {} 条，超出条目将被丢弃\"}}}}\n",
+            "{{\"timestamp\":\"{}\",\"level\":\"WARN\",\"target\":\"tessera::observability\",\"fields\":{{\"rate_limited_plugin\":{},\"limit\":{},\"message\":\"插件日志超过每秒 {} 条，超出条目将被丢弃\"}}}}\n",
             sink.iso_now(),
-            plugin_id.escape_default(),
+            plugin_id_json,
             self.limit,
             self.limit
         );

@@ -11,8 +11,17 @@ cd "$(dirname "$0")/.."
 BANNED="reqwest|ureq|curl|isahc|surf|hyper|attohttpc|minreq|wget-rs|emhttp"
 
 fail=0
-out="$(cargo tree -p tessera-core -p tracing -p tracing-subscriber --all-features 2>&1 \
-  | grep -vE "(^warning|deprecated|config\.toml|^Downloading|^Downloaded|registry|^ *\||^ *=|^help:|^ *$)")"
+
+# 先捕获原始输出并显式检查退出码：cargo tree 失败（依赖解析错误等）时若继续走
+# 文本匹配，错误输出过滤后不含被禁包名，会误判 PASS——安全检查必须 fail-closed。
+# （check-deps.sh 靠 "did not match any packages" 特征串天然 fail-closed，此处对齐。）
+raw="$(cargo tree -p tessera-core -p tracing -p tracing-subscriber --all-features 2>&1)"
+if [ $? -ne 0 ]; then
+  echo "FAIL  cargo tree 执行失败，无法验证依赖树："
+  printf '%s\n' "$raw" | grep -vE "(^warning|deprecated|config\.toml|^Downloading|^Downloaded|registry|^ *\||^ *=|^help:|^ *$)" | sed 's/^/        /'
+  exit 1
+fi
+out="$(printf '%s\n' "$raw" | grep -vE "(^warning|deprecated|config\.toml|^Downloading|^Downloaded|registry|^ *\||^ *=|^help:|^ *$)")"
 
 # cargo tree 输出形如 "├── reqwest v0.12.1"；匹配包名出现在行首树字符之后
 hits="$(printf '%s\n' "$out" | grep -E "[│ ├─└ ]+(${BANNED}) v[0-9]")"

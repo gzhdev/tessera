@@ -90,5 +90,5 @@
 
 ## Open Questions
 
-- CI 平台尚未选定（GitHub Actions / 其他）。这不影响任何 spec 或任务拆分，检查命令本身与平台无关，选定后填进配置即可。
+- ~~CI 平台尚未选定（GitHub Actions / 其他）~~（实施注记：已选定 GitHub Actions，落地为 `.github/workflows/ci.yml`；检查命令保持平台无关。）
 - 是否需要 macOS / Linux 的 CI 矩阵。当前开发环境是 Windows，而 §7.2 的路径处理有明确的 Windows 特有风险。跨平台矩阵可以等到 `core-host-fs` 时再加——那才是第一个真正有平台差异的 change。

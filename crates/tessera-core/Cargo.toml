@@ -9,9 +9,9 @@ tessera-error = { path = "../tessera-error" }
 tessera-manifest = { path = "../tessera-manifest" }
 tessera-store = { path = "../tessera-store" }
 tessera-sandbox = { path = "../tessera-sandbox" }
+serde_json = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 [dev-dependencies]
-serde_json = { workspace = true }
 tempfile = "3"

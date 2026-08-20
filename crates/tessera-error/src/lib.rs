@@ -296,8 +296,8 @@ mod tests {
     fn all_codes_match_format() {
         let all = ErrorCode::all();
         assert!(
-            all.len() >= 38,
-            "§12.1 已知成员共 38 个，实际 {}",
+            all.len() >= 40,
+            "§12.1 示例列 38 个 + §4.4 流水线明确使用的 E_MANIFEST_VERSION / E_MANIFEST_MAIN，实际 {}",
             all.len()
         );
         for code in &all {
