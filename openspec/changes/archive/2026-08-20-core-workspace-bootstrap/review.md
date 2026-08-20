@@ -56,3 +56,18 @@
 
 - **位置**：`openspec/changes/core-workspace-bootstrap/design.md:93`
 - **问题**：「CI 平台尚未选定（GitHub Actions / 其他）」——但本次变更新增了 `.github/workflows/ci.yml`（GitHub Actions），平台已选定。本次对 design.md 的其他段落均做了实施注记（D3/D4、风险表、Migration Plan），唯独此处漏改。不影响功能，归档前可顺手更新。
+
+## 修复落地记录（2026-08-20）
+
+全部 6 个问题已在归档前修复完毕，分布于两笔提交：
+
+| # | 问题 | 处置 | 落地提交 |
+|---|---|---|---|
+| 1 | `docs/` 被 `.gitignore` 屏蔽 | 删除 `docs/` 规则，`docs/` 全部 4 个文件（含 `toolchain-baseline.md`）入库 | 420653b |
+| 2 | `Cargo.lock` 被忽略 | 删除 `Cargo.lock` 规则，根锁文件与 `examples/toolchain-roundtrip/Cargo.lock` 均已提交 | 420653b |
+| 3 | `check-log-no-network.sh` fail-open | 显式检查 `cargo tree` 退出码，失败即 FAIL；红绿双向验证通过（注入坏包名 → FAIL exit=1，还原 → PASS） | afab754 |
+| 4 | MANIFEST 域缺 2 个错误码 | 补 `E_MANIFEST_VERSION` / `E_MANIFEST_MAIN`（注释标明 §4.4 出处），断言 38→40，`cargo test -p tessera-error` 全绿 | afab754 |
+| 5 | 丢弃警告行 JSON 转义非法 | 改用 `serde_json::to_string`，`serde_json` 提升为 tessera-core 运行时依赖，7 个 observability 测试全过 | afab754 |
+| 6 | design.md:93 开放问题过期 | 划线并加实施注记（已选定 GitHub Actions） | afab754 |
+
+修复后全量门禁复核：`cargo fmt --check`、`clippy -D warnings`、`cargo test --workspace`、`check-deps.sh`、`check-log-no-network.sh`、`openspec validate` 全部通过。

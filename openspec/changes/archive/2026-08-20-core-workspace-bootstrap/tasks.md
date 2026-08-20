@@ -24,7 +24,8 @@
 
 - [x] 3.1 写检查脚本：对 5 个内核 crate 各跑一次 `cargo tree -i tauri -p <crate> --all-features`，任一有输出即失败并打印引入路径。验证：手动在 `tessera-core` 加一条 tauri 依赖，脚本报错并指出路径；移除后脚本通过
 - [x] 3.2 写检查脚本：对 `tessera-core` 跑 `cargo tree -i wasmtime -p tessera-core --all-features`，有输出即失败。验证：手动加依赖后脚本报错，移除后通过
-- [ ] 3.3 配置 CI 流水线：fmt、clippy（`-D warnings`）、`cargo test --workspace`、3.1、3.2，以及第 1 组的往返冒烟用例。验证：CI 在一次提交上全绿；故意提交一次违规依赖后 CI 变红
+- [x] 3.3 配置 CI 流水线：fmt、clippy（`-D warnings`）、`cargo test --workspace`、3.1、3.2，以及第 1 组的往返冒烟用例。验证：CI 在一次提交上全绿；故意提交一次违规依赖后 CI 变红
+  - 实施注记（2026-08-20）：CI 落地为 `.github/workflows/ci.yml`（`rust-checks` 覆盖 fmt/clippy/test/3.1/3.2，`toolchain-smoke` 覆盖往返冒烟）。3.1/3.2 的红绿验证与全部本地门禁已在开发机逐条实证通过；**远程**红绿观察推迟至分支首推时进行——变更本体（420653b）与审查修复（afab754）两笔提交尚未推送，首推后需确认 GitHub Actions 首轮全绿。
 
 ## 4. 错误模型
 
