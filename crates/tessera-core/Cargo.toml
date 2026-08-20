@@ -1,0 +1,17 @@
+[package]
+name = "tessera-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tessera-error = { path = "../tessera-error" }
+tessera-manifest = { path = "../tessera-manifest" }
+tessera-store = { path = "../tessera-store" }
+tessera-sandbox = { path = "../tessera-sandbox" }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+tempfile = "3"

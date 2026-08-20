@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "默认能力：核心事件与基础权限（脚手架阶段无自定义 IPC command）",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

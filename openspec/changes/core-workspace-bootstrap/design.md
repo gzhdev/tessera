@@ -43,6 +43,8 @@
 
 **选择**：错误码 `ErrorCode` 是一个全局 enum（放在最底层的共享位置），三段式结构 `TesseraError { code, user_message, developer_detail }` 同样只有一份。
 
+「最底层的共享位置」在实施时定死为**新增第 8 个 crate `crates/tessera-error`**：§12.1 的 `E_HOST_DB` 必须由 `tessera-store` 构造，而 store 在 §17.1 方向图中是叶子——枚举放进任何现有内核 crate 都会产生图上不存在的依赖边。`tessera-error` 成为全部内核 crate 的下游新叶子（不破坏方向图），tauri/wasmtime 依赖检查把它一并纳入受检清单。
+
 **理由**：spec 要求错误码可跨边界传递且可与常量做相等比较。若每个 crate 定义自己的 error 再层层 `From` 转换，跨边界时要么丢失原始错误码，要么每层都要维护映射表。单一 enum 的代价是底层 crate 会「认识」上层的错误码（比如 `tessera-manifest` 能构造 `E_TRAP_*`），这是可接受的——错误码是**契约**，不是实现细节。
 
 **放弃的选项**：每 crate 一个 enum + `#[from]` 链（映射维护成本高、跨边界易丢信息）；`anyhow`（丢失结构化错误码，与 spec 冲突）。
@@ -54,6 +56,8 @@
 **理由**：spec 要求限速按插件独立、且不影响宿主日志。若在 `host-log` 的实现里做判断，只能覆盖插件主动写的日志，覆盖不了宿主为插件写的日志（后者同样带插件标识、同样可能被插件的行为放大——比如一个疯狂触发权限拒绝的插件）。做成 Layer 则一处覆盖全部路径。
 
 **放弃的选项**：在 `host-log` 的 host 函数里判断（覆盖不全）。
+
+**实施注记**（落地形态与「Layer」的偏差）：限速实现为 per-layer `Filter`（在 `event_enabled` 阶段裁决，按事件 `plugin_id` 字段分桶）；截断落在自定义轮转写入器里（单条 8 KB 上限对宿主与插件一视同仁，属安全超集）；「进入丢弃状态记一条警告」因 tracing 的 per-layer FilterState 两阶段协议不允许在过滤器回调内再发事件，改为**旁路直写**日志文件（同构 JSON 行，不可能被限速自身丢弃）。
 
 ### D5 · crate 放在 `crates/` 子目录，`src-tauri` 与 `src` 留在根
 
@@ -71,15 +75,15 @@
 
 | 风险 | 缓解 |
 |---|---|
-| `wasm32-wasip2` 工具链在 Windows 上不可用或极不稳定 | 这正是把验证排在第一位的原因。若确认不可用，需回到设计书 §8 重新评估沙箱方案——此时尚未有任何投入沉没 |
-| 设计书 §8.2 把 `StoreLimits::instances` 定为 1，但 component model 下一次实例化可能产生多个 core instance，会导致合法插件装不起来 | 在往返用例里实测该限额，把实际需要的值写进 `docs/toolchain-baseline.md`，供 `core-wasm-sandbox` 采用 |
+| `wasm32-wasip2` 工具链在 Windows 上不可用或极不稳定 | **已证伪为可行**：往返用例通过，验证过的版本组合与构建命令见 `docs/toolchain-baseline.md` |
+| 设计书 §8.2 把 `StoreLimits::instances` 定为 1，但 component model 下一次实例化可能产生多个 core instance，会导致合法插件装不起来 | **已实测命中**：最小可行值为 **3**（探针用例常驻 `examples/toolchain-roundtrip`，结论见 `docs/toolchain-baseline.md`）。`core-wasm-sandbox` 不得沿用 1，建议默认 8 |
 | `cargo tree` 的 feature 敏感性导致假阴性 | 检查加 `--all-features`；并在 `core-wasm-sandbox`（第一个真正引入 wasmtime 的 change）中补一次人工复核 |
 | 单一错误码 enum 会随项目增长变得很大 | 接受。错误码本来就是一份需要集中查阅的清单，分散反而更难维护。按域分模块组织即可 |
 
 ## Migration Plan
 
 1. 把现有 `Cargo.toml` 改为 workspace 根，`src/main.rs` 移入 `src-tauri/src/`
-2. 建 7 个 crate 骨架，依赖边按 §17.1 的方向图连好（此时都是空 lib，依赖边为空也合法——检查脚本此刻恒过，这是预期的）
+2. 建 8 个 crate 骨架（含 `tessera-error`），依赖边按 §17.1 的方向图连好（此时都是空 lib，依赖边为空也合法——检查脚本此刻恒过，这是预期的）
 3. 工具链验证独立于 workspace 推进，产出基线文档后再把冒烟用例接进 CI
 
 无回滚需求——本 change 之前仓库几乎是空的。

@@ -1,0 +1,75 @@
+# Tessera 持续集成（core-workspace-bootstrap 任务 3.3）
+#
+# 设计原则（design.md Non-Goals）：不追求完备性（覆盖率、跨平台矩阵），
+# 只要 fmt / clippy / test / 两条依赖方向检查 / 一个 WASM 组件往返冒烟。
+name: CI
+
+on:
+  push:
+    branches: [master, dev]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rust-checks:
+    name: fmt / clippy / test / 依赖方向
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: 安装 Tauri 系统依赖（src-tauri 构建需要）
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: 格式检查
+        run: cargo fmt --all --check
+
+      - name: Clippy（-D warnings）
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: 测试
+        run: cargo test --workspace
+
+      - name: 依赖方向硬性检查（§17.1 约束 1/2）
+        run: bash scripts/check-deps.sh
+
+      - name: 日志子系统无网络出口检查
+        run: bash scripts/check-log-no-network.sh
+
+  toolchain-smoke:
+    name: WASM Component Model 工具链冒烟
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 Rust 与 wasm32-wasip2 target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-wasip2
+
+      - name: 安装 wasm-tools
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-tools@1.257.1
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: examples/toolchain-roundtrip
+
+      - name: 往返用例（guest 构建 → component 反解 → host 实例化回调）
+        working-directory: examples/toolchain-roundtrip
+        run: |
+          cargo build -p roundtrip-guest --target wasm32-wasip2
+          wasm-tools component wit target/wasm32-wasip2/debug/roundtrip_guest.wasm | grep -F "import host-tag: func(name: string) -> string;"
+          wasm-tools component wit target/wasm32-wasip2/debug/roundtrip_guest.wasm | grep -F "export plugin-run: func(input: string) -> string;"
+          cargo test -p roundtrip-host -- --nocapture

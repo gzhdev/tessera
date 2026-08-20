@@ -1,0 +1,10 @@
+package tessera:roundtrip@0.1.0;
+
+/// 最小工具链冒烟 world：1 个 import + 1 个 export。
+world roundtrip {
+    /// 宿主提供给插件的函数（import）：给名字打上宿主标记。
+    import host-tag: func(name: string) -> string;
+
+    /// 插件提供给宿主的函数（export）：内部回调 host-tag，验证双向调用链。
+    export plugin-run: func(input: string) -> string;
+}

@@ -13,7 +13,7 @@
 ## What Changes
 
 - **工具链基线验证**：最小 WIT 往返（1 个 import + 1 个 export）→ `wit-bindgen` guest → `wasm32-wasip2` → `wasm-tools component new` → wasmtime 宿主实例化并回调 host 函数。产出 `docs/toolchain-baseline.md`（可复现的版本组合），并把往返用例保留为 CI 冒烟测试，用于防工具链漂移
-- **Cargo workspace 与 crate 骨架**：`tessera-manifest` / `tessera-ui-schema` / `tessera-store` / `tessera-sandbox` / `tessera-core` / `tessera-sdk` / `src-tauri`，依赖边按 §17.1 的方向图连好
+- **Cargo workspace 与 crate 骨架**：`tessera-manifest` / `tessera-ui-schema` / `tessera-store` / `tessera-sandbox` / `tessera-core` / `tessera-sdk` / `src-tauri`，另增 `tessera-error` 作为错误模型所在的最底层共享 crate（实施时定死，理由见 design.md D3：`E_HOST_DB` 必须由 store 构造，而 store 是 §17.1 图的叶子，枚举放进任何现有 crate 都违反依赖方向），依赖边按 §17.1 的方向图连好
 - **前端脚手架**：Vite + Vue 3 + TypeScript，`tauri dev` 能起窗口并渲染一个占位页
 - **依赖方向的 CI 强制**：§17.1 约束 1（五个内核 crate 依赖树中不得出现 `tauri`）与约束 2（`tessera-core` 依赖树中不得出现 `wasmtime`）
 - **统一错误模型**：§12.1 的全部错误码前缀落为 Rust enum；三段式错误结构（错误码 / 面向用户的一句话 / 面向开发者的细节）
@@ -37,7 +37,7 @@
 
 **新增**
 
-- `Cargo.toml`（workspace 根）、`crates/*/`（7 个 crate 骨架）、`src-tauri/`、`src/`（前端脚手架）
+- `Cargo.toml`（workspace 根）、`crates/*/`（8 个 crate 骨架：5 个内核 + `tessera-sdk` + `tessera-error`）、`src-tauri/`、`src/`（前端脚手架）
 - `docs/toolchain-baseline.md`
 - `.github/workflows/ci.yml`（或等价 CI 配置）
 - `examples/toolchain-roundtrip/`（工具链冒烟测试）
@@ -48,7 +48,7 @@
 
 **新增依赖**
 
-- `thiserror`（错误类型）、`tracing` / `tracing-subscriber` / `tracing-appender`（日志）
+- `thiserror`（错误类型）、`serde` / `serde_json`（错误码与三段式结构的字符串序列化）、`tracing` / `tracing-subscriber`（日志；按天轮转写入器自实现——`tracing-appender` 的 `max_log_files` 按文件数而非日期保留，满足不了「只有 3 个文件时也删掉 8 天前的」这一 spec 场景）
 - 验证阶段：`wasmtime`、`wit-bindgen`、`wasm-tools`（前两者最终落在 `tessera-sandbox`，本 change 只在 `examples/` 中用到）
 
 **下游影响**

@@ -1,0 +1,9 @@
+[package]
+name = "roundtrip-host"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+wasmtime = { version = "47", features = ["component-model"] }
+wasmtime-wasi = "47"
