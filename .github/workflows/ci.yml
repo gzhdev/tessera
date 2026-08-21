@@ -45,6 +45,11 @@ jobs:
           cargo run -p tessera-manifest --bin gen-schema
           git diff --exit-code -- crates/tessera-manifest/schema/
 
+      - name: UI 类型生成物一致性（§17.2：types/generated 从 Rust 类型生成，禁止手改）
+        run: |
+          cargo run -p tessera-ui-schema --bin gen-types
+          git diff --exit-code -- src/types/generated/
+
       - name: 依赖方向硬性检查（§17.1 约束 1/2）
         run: bash scripts/check-deps.sh
 

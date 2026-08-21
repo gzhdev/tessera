@@ -1,0 +1,17 @@
+{
+  "root": {
+    "type": "table",
+    "id": "files",
+    "props": {
+      "columns": [
+        { "key": "name", "title": "文件名", "width": "2fr" },
+        { "key": "status", "title": "状态", "width": "1fr" }
+      ],
+      "rows": [
+        { "name": "a.txt", "status": "已同步" },
+        { "name": "b.txt", "status": "待处理" }
+      ]
+    },
+    "on": { "rowClick": "open-file" }
+  }
+}

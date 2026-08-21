@@ -1,0 +1,2 @@
+{ "root": { "type": "grid", "id": "g", "props": { "columns": 2, "gap": 8 },
+  "children": [ { "type": "text", "id": "a", "props": { "text": "1" } } ] } }

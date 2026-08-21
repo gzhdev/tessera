@@ -1,0 +1,1 @@
+{ "root": { "type": "image", "id": "img", "props": { "source": "data:image/png;base64,xx", "alt": "图", "width": 64 } } }

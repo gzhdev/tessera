@@ -1,0 +1,3 @@
+{ "root": { "type": "split", "id": "sp", "props": { "direction": "horizontal", "ratio": 0.3 },
+  "children": [ { "type": "text", "id": "l", "props": { "text": "左" } },
+                { "type": "text", "id": "r", "props": { "text": "右" } } ] } }

@@ -1,0 +1,2 @@
+{ "root": { "type": "group", "id": "g", "props": { "title": "设置", "collapsible": true },
+  "children": [ { "type": "text", "id": "a", "props": { "text": "x" } } ] } }

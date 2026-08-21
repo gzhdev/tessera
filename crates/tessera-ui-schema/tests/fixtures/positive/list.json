@@ -1,0 +1,1 @@
+{ "root": { "type": "list", "id": "l", "props": { "items": [ { "title": "甲", "subtitle": "说明", "icon": "file" } ] } } }

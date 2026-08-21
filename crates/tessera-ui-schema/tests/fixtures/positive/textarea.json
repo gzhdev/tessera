@@ -1,0 +1,1 @@
+{ "root": { "type": "textarea", "id": "t", "props": { "placeholder": "多行", "rows": 4 }, "on": { "change": "set-text" } } }

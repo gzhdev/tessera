@@ -1,0 +1,1 @@
+{ "root": { "type": "file-picker", "id": "fp", "props": { "label": "选择 CSV", "accept": ["csv"] }, "on": { "pick": "load-csv" } } }

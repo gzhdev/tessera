@@ -1,0 +1,11 @@
+{
+  "root": {
+    "type": "hstack",
+    "id": "actions",
+    "props": { "gap": 6 },
+    "children": [
+      { "type": "button", "id": "ok", "props": { "label": "确定" } },
+      { "type": "button", "id": "cancel", "props": { "label": "取消" } }
+    ]
+  }
+}

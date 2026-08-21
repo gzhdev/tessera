@@ -1,0 +1,8 @@
+{
+  "root": {
+    "type": "text-input",
+    "id": "endpoint",
+    "props": { "placeholder": "https://…", "debounce": 300 },
+    "on": { "change": "set-endpoint" }
+  }
+}

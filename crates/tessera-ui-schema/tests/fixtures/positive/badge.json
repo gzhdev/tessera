@@ -1,0 +1,1 @@
+{ "root": { "type": "badge", "id": "b", "props": { "text": "已同步", "tone": "success" } } }

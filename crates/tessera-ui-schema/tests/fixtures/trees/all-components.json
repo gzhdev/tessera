@@ -1,0 +1,277 @@
+{
+  "root": {
+    "type": "vstack",
+    "id": "root",
+    "props": {},
+    "children": [
+      {
+        "type": "vstack",
+        "id": "n-vstack-0",
+        "props": {
+          "gap": 8
+        }
+      },
+      {
+        "type": "hstack",
+        "id": "n-hstack-1",
+        "props": {
+          "gap": 4
+        }
+      },
+      {
+        "type": "text",
+        "id": "n-text-2",
+        "props": {
+          "text": "t"
+        }
+      },
+      {
+        "type": "button",
+        "id": "n-button-3",
+        "props": {
+          "label": "b"
+        }
+      },
+      {
+        "type": "text-input",
+        "id": "n-text-input-4",
+        "props": {
+          "placeholder": "p"
+        }
+      },
+      {
+        "type": "table",
+        "id": "n-table-5",
+        "props": {
+          "columns": [
+            {
+              "key": "k",
+              "title": "K"
+            }
+          ],
+          "rows": [
+            {
+              "k": "v"
+            }
+          ]
+        }
+      },
+      {
+        "type": "grid",
+        "id": "n-grid-6",
+        "props": {
+          "columns": 2
+        }
+      },
+      {
+        "type": "scroll",
+        "id": "n-scroll-7",
+        "props": {
+          "maxHeight": 100
+        }
+      },
+      {
+        "type": "tabs",
+        "id": "n-tabs-8",
+        "props": {
+          "labels": [
+            "a"
+          ]
+        }
+      },
+      {
+        "type": "group",
+        "id": "n-group-9",
+        "props": {
+          "title": "g"
+        }
+      },
+      {
+        "type": "spacer",
+        "id": "n-spacer-10",
+        "props": {}
+      },
+      {
+        "type": "split",
+        "id": "n-split-11",
+        "props": {
+          "direction": "horizontal"
+        }
+      },
+      {
+        "type": "heading",
+        "id": "n-heading-12",
+        "props": {
+          "text": "h",
+          "level": 2
+        }
+      },
+      {
+        "type": "badge",
+        "id": "n-badge-13",
+        "props": {
+          "text": "b",
+          "tone": "info"
+        }
+      },
+      {
+        "type": "divider",
+        "id": "n-divider-14",
+        "props": {}
+      },
+      {
+        "type": "icon",
+        "id": "n-icon-15",
+        "props": {
+          "name": "check"
+        }
+      },
+      {
+        "type": "markdown",
+        "id": "n-markdown-16",
+        "props": {
+          "source": "# m"
+        }
+      },
+      {
+        "type": "code",
+        "id": "n-code-17",
+        "props": {
+          "code": "x"
+        }
+      },
+      {
+        "type": "image",
+        "id": "n-image-18",
+        "props": {
+          "source": "data:image/png;base64,x"
+        }
+      },
+      {
+        "type": "empty-state",
+        "id": "n-empty-state-19",
+        "props": {
+          "message": "空"
+        }
+      },
+      {
+        "type": "textarea",
+        "id": "n-textarea-20",
+        "props": {}
+      },
+      {
+        "type": "number-input",
+        "id": "n-number-input-21",
+        "props": {
+          "value": 1
+        }
+      },
+      {
+        "type": "select",
+        "id": "n-select-22",
+        "props": {
+          "options": [
+            {
+              "value": "a",
+              "label": "A"
+            }
+          ]
+        }
+      },
+      {
+        "type": "checkbox",
+        "id": "n-checkbox-23",
+        "props": {
+          "checked": true
+        }
+      },
+      {
+        "type": "radio-group",
+        "id": "n-radio-group-24",
+        "props": {
+          "options": [
+            {
+              "value": "x",
+              "label": "X"
+            }
+          ]
+        }
+      },
+      {
+        "type": "switch",
+        "id": "n-switch-25",
+        "props": {
+          "on": false
+        }
+      },
+      {
+        "type": "slider",
+        "id": "n-slider-26",
+        "props": {
+          "min": 0,
+          "max": 10
+        }
+      },
+      {
+        "type": "file-picker",
+        "id": "n-file-picker-27",
+        "props": {
+          "label": "选"
+        }
+      },
+      {
+        "type": "list",
+        "id": "n-list-28",
+        "props": {
+          "items": [
+            {
+              "title": "t"
+            }
+          ]
+        }
+      },
+      {
+        "type": "tree",
+        "id": "n-tree-29",
+        "props": {
+          "nodes": [
+            {
+              "label": "n"
+            }
+          ]
+        }
+      },
+      {
+        "type": "key-value",
+        "id": "n-key-value-30",
+        "props": {
+          "entries": [
+            {
+              "key": "k",
+              "value": "v"
+            }
+          ]
+        }
+      },
+      {
+        "type": "alert",
+        "id": "n-alert-31",
+        "props": {
+          "message": "m"
+        }
+      },
+      {
+        "type": "progress",
+        "id": "n-progress-32",
+        "props": {
+          "value": 0.5
+        }
+      },
+      {
+        "type": "spinner",
+        "id": "n-spinner-33",
+        "props": {}
+      }
+    ]
+  }
+}

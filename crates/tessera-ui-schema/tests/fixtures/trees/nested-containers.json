@@ -1,0 +1,9 @@
+{ "root": { "type": "split", "id": "root", "props": { "direction": "horizontal", "ratio": 0.3 },
+  "children": [
+    { "type": "vstack", "id": "left", "props": { "gap": 8 },
+      "children": [ { "type": "scroll", "id": "sc", "props": { "maxHeight": 200 },
+        "children": [ { "type": "text", "id": "leaf", "props": { "text": "深叶子" } } ] } ] },
+    { "type": "tabs", "id": "right", "props": { "labels": ["甲", "乙"] },
+      "children": [ { "type": "group", "id": "g1", "props": { "title": "组" },
+        "children": [ { "type": "text", "id": "gt", "props": { "text": "组内" } } ] } ] }
+  ] } }

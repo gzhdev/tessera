@@ -1,0 +1,1 @@
+{ "root": { "type": "select", "id": "s", "props": { "options": [ { "value": "a", "label": "甲" }, { "value": "b", "label": "乙" } ], "value": "a" }, "on": { "change": "pick" } } }

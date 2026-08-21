@@ -1,0 +1,1 @@
+{ "root": { "type": "number-input", "id": "n", "props": { "value": 3, "min": 0, "max": 10, "step": 1 }, "on": { "change": "set-n" } } }

@@ -1,0 +1,3 @@
+{
+  "root": { "type": "text", "id": "title", "props": { "text": "同步状态", "muted": false } }
+}

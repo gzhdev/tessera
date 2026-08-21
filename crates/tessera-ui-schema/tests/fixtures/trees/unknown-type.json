@@ -1,0 +1,6 @@
+{ "root": { "type": "vstack", "id": "root", "props": {},
+  "children": [
+    { "type": "text", "id": "ok-1", "props": { "text": "正常1" } },
+    { "type": "flying-toaster", "id": "bad", "props": { "wings": 2 } },
+    { "type": "button", "id": "ok-2", "props": { "label": "正常2" } }
+  ] } }

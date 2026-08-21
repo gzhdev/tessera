@@ -1,0 +1,1 @@
+{ "root": { "type": "alert", "id": "a", "props": { "message": "注意", "tone": "warning" } } }

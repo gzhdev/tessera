@@ -1,0 +1,1 @@
+{ "root": { "type": "slider", "id": "root", "props": { "min": "不是数字", "max": 100 } } }

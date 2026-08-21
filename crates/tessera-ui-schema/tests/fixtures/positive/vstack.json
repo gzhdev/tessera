@@ -1,0 +1,10 @@
+{
+  "root": {
+    "type": "vstack",
+    "id": "root",
+    "props": { "gap": 8, "padding": 12 },
+    "children": [
+      { "type": "text", "id": "t1", "props": { "text": "子项" } }
+    ]
+  }
+}
