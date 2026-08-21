@@ -6,3 +6,11 @@ license.workspace = true
 
 [dependencies]
 tessera-error = { path = "../tessera-error" }
+r2d2 = "0.8"
+r2d2_sqlite = "0.35"
+rusqlite = { version = "0.40", features = ["bundled"] }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
