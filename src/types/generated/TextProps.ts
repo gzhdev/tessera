@@ -13,4 +13,4 @@ text: string,
 /**
  * 是否弱化显示（次要信息）。
  */
-muted?: boolean, extraProbe?: number, };
+muted?: boolean, };

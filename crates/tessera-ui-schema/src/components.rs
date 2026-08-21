@@ -1,8 +1,5 @@
-//! 六个代表性组件的 props 契约（design.md 推进顺序建议：先打通管线再补齐）。
-//!
-//! 布局容器：[`VStackProps`] / [`HStackProps`]；纯展示：[`TextProps`]；
-//! 输入（无值事件）：[`ButtonProps`]；输入（有值事件）：[`TextInputProps`]；
-//! 数据（结构化载荷事件）：[`TableProps`]。
+//! 34 个组件的 props 契约，覆盖设计书 §9.2 五类清单：布局 / 展示 / 输入 /
+//! 数据 / 反馈。组件标记枚举与清单见 `node.rs`（`component_tags!` 宏）。
 //!
 //! 所有 props struct 均 `deny_unknown_fields`：契约未定义的属性在校验期
 //! 被拒，配合「组件清单」Requirement 的「属性类型不符被报告」场景。
@@ -51,9 +48,6 @@ pub struct TextProps {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub muted: Option<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[ts(optional)]
-    pub extra_probe: Option<u32>,
 }
 
 /// `button`：按钮（无值事件代表：`click` 不携带载荷）。
@@ -330,7 +324,7 @@ pub struct CodeProps {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 #[ts(export_to = "ImageProps.ts", rename_all = "camelCase")]
 pub struct ImageProps {
-    /// 图片来源（data URL 或宿主交付的 blob 标识，不含文件系统路径）。
+    /// 图片来源（`data:` URI 或虚拟路径，设计书 §9.6）。
     pub source: String,
     /// 替代文本。
     #[serde(default, skip_serializing_if = "Option::is_none")]

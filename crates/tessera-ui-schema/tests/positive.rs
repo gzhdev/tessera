@@ -70,12 +70,35 @@ fn positive_table() {
     );
 }
 
-/// 2.1：只含 type 与 id 的最小节点解析成功。
+/// 2.1：只含 type 与 id 的最小节点解析成功（spec「最小合法节点」：
+/// 其余字段可省略，含 props）。
 #[test]
 fn minimal_node_only_type_and_id() {
-    let value =
-        serde_json::json!({ "root": { "type": "text", "id": "t", "props": { "text": "x" } } });
+    let value = serde_json::json!({ "root": { "type": "vstack", "id": "x" } });
     let outcome = validate_tree(&value);
-    assert!(outcome.tree.is_some());
+    assert!(
+        outcome.tree.is_some(),
+        "最小节点应合法，警告：{:?}",
+        outcome.warnings
+    );
     assert!(outcome.degraded.is_empty());
+}
+
+/// 最小节点对必填 props 组件：报「属性缺失」（PropTypeMismatch）而非结构拒绝。
+#[test]
+fn minimal_node_with_required_props_reports_missing_prop() {
+    let value = serde_json::json!({ "root": { "type": "button", "id": "x" } });
+    let outcome = validate_tree(&value);
+    assert!(outcome.tree.is_none());
+    assert_eq!(outcome.degraded.len(), 1);
+    let w = outcome
+        .warnings
+        .iter()
+        .find(|w| w.kind == tessera_ui_schema::WarningKind::PropTypeMismatch)
+        .expect("应有属性类型不符警告");
+    assert!(
+        w.message.contains("label"),
+        "警告应指出缺失的必填属性：{}",
+        w.message
+    );
 }

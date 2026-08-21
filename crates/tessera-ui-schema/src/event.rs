@@ -28,21 +28,19 @@ pub struct UiEvent {
 
 /// 事件载荷：按组件契约区分的固定形态（untagged，由结构区分）。
 ///
-/// - 纯文本：`"..."`（text-input 等）
+/// - 字符串载荷：`"..."`（text-input / select / radio-group 等）
 /// - 表格行：`{ rowIndex, row }`
 /// - 文件选择：`{ token, fileName, size }`（v0.3 决策 B3，design.md D5）
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[serde(untagged)]
 #[ts(export_to = "EventValue.ts")]
 pub enum EventValue {
-    /// 带值输入的文本载荷（text-input / textarea 等）。
+    /// 带值输入的字符串载荷（text-input / textarea / select / radio-group）。
     Text(String),
     /// 数字输入的载荷（number-input / slider 等）。
     Number(f64),
     /// 开关 / 勾选框的布尔载荷（switch / checkbox）。
     Bool(bool),
-    /// 下拉选择的选中项（select / radio-group）。
-    Selection(String),
     /// 表格行交互：`rowClick` 同时携带行序号与行数据。
     TableRow(TableRowPick),
     /// 文件选择交付：`{ token, fileName, size }`，无任何路径字段（D5）。
@@ -74,5 +72,6 @@ pub struct FilePickValue {
     /// 文件名（不含目录）。
     pub file_name: String,
     /// 字节数。
+    #[ts(type = "number")]
     pub size: u64,
 }

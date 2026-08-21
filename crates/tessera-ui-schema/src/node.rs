@@ -5,8 +5,8 @@
 //! `{ "type": "button", "id": "ok", "props": { ... }, ... }`（设计书 §9.3）。
 //!
 //! 每个组件一个 props struct（`deny_unknown_fields`：传入契约未定义的属性
-//! 会被拒绝）。先落 6 个代表性组件打通生成管线（design.md 推进顺序建议），
-//! 其余组件见第 4 组任务。
+//! 会被拒绝）。组件清单共 34 个，覆盖设计书 §9.2 的五类（布局 / 展示 /
+//! 输入 / 数据 / 反馈），定义见 `components.rs`。
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -165,47 +165,67 @@ pub enum Component {
     Spinner(SpinnerProps),
 }
 
-impl Component {
-    /// 组件类型标记（JSON 中的 `type` 字段值，kebab-case）。
-    pub fn type_tag(&self) -> &'static str {
-        match self {
-            Component::VStack(_) => "vstack",
-            Component::HStack(_) => "hstack",
-            Component::Text(_) => "text",
-            Component::Button(_) => "button",
-            Component::TextInput(_) => "text-input",
-            Component::Table(_) => "table",
-            Component::Grid(_) => "grid",
-            Component::Scroll(_) => "scroll",
-            Component::Tabs(_) => "tabs",
-            Component::Group(_) => "group",
-            Component::Spacer(_) => "spacer",
-            Component::Split(_) => "split",
-            Component::Heading(_) => "heading",
-            Component::Badge(_) => "badge",
-            Component::Divider(_) => "divider",
-            Component::Icon(_) => "icon",
-            Component::Markdown(_) => "markdown",
-            Component::Code(_) => "code",
-            Component::Image(_) => "image",
-            Component::EmptyState(_) => "empty-state",
-            Component::Textarea(_) => "textarea",
-            Component::NumberInput(_) => "number-input",
-            Component::Select(_) => "select",
-            Component::Checkbox(_) => "checkbox",
-            Component::RadioGroup(_) => "radio-group",
-            Component::Switch(_) => "switch",
-            Component::Slider(_) => "slider",
-            Component::FilePicker(_) => "file-picker",
-            Component::List(_) => "list",
-            Component::Tree(_) => "tree",
-            Component::KeyValue(_) => "key-value",
-            Component::Alert(_) => "alert",
-            Component::Progress(_) => "progress",
-            Component::Spinner(_) => "spinner",
-        }
-    }
+/// 组件标记清单——`type_tag()` 与 [`is_known_type`] 的单一事实源。
+///
+/// 一处宏同时生成两者，编译期保证同步；新增组件在此追加一行即可
+/// （顺序与枚举变体一致，见 ADDING_A_COMPONENT.md）。
+macro_rules! component_tags {
+    ($($variant:ident => $tag:literal),* $(,)?) => {
+        impl Component {
+            /// 组件类型标记（JSON 中的 `type` 字段值）。
+            pub fn type_tag(&self) -> &'static str {
+                match self {
+                    $(Component::$variant(_) => $tag,)*
+                }
+            }
 
+            /// 类型标记是否在组件清单内（validate 模块的白名单判别：
+            /// 区分「未知组件」与「属性类型不符」）。
+            pub fn is_known_type(tag: &str) -> bool {
+                matches!(tag, $($tag)|*)
+            }
+        }
+    };
+}
+
+component_tags! {
+    VStack => "vstack",
+    HStack => "hstack",
+    Text => "text",
+    Button => "button",
+    TextInput => "text-input",
+    Table => "table",
+    Grid => "grid",
+    Scroll => "scroll",
+    Tabs => "tabs",
+    Group => "group",
+    Spacer => "spacer",
+    Split => "split",
+    Heading => "heading",
+    Badge => "badge",
+    Divider => "divider",
+    Icon => "icon",
+    Markdown => "markdown",
+    Code => "code",
+    Image => "image",
+    EmptyState => "empty-state",
+    Textarea => "textarea",
+    NumberInput => "number-input",
+    Select => "select",
+    Checkbox => "checkbox",
+    RadioGroup => "radio-group",
+    Switch => "switch",
+    Slider => "slider",
+    FilePicker => "file-picker",
+    List => "list",
+    Tree => "tree",
+    KeyValue => "key-value",
+    Alert => "alert",
+    Progress => "progress",
+    Spinner => "spinner",
+}
+
+impl Component {
     /// 该组件是否为容器类（`children` 有意义）。
     pub fn is_container(&self) -> bool {
         matches!(

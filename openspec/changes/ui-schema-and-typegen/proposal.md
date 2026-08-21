@@ -34,14 +34,14 @@
 
 **新增**
 
-- `crates/tessera-ui-schema/src/{node.rs, event.rs, components/*.rs}`
+- `crates/tessera-ui-schema/src/{node.rs, components.rs, event.rs, tree.rs, validate.rs, bin/gen-types.rs}`（实现为按职责分文件的单层模块，`components.rs` 收拢 34 个 props 契约）
 - `src/types/generated/`（**生成物**，纳入 git）
 - 生成脚本与 CI 一致性检查
 - `crates/tessera-ui-schema/tests/fixtures/`：正例树、未知类型树、非法 props 树
 
 **新增依赖**
 
-- `ts-rs`（或等价工具，见 design.md 的取舍）、`serde`
+- `ts-rs`（或等价工具，见 design.md 的取舍）、`serde`、`serde_json`（校验入口的输入形态）
 
 **下游影响**
 

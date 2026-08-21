@@ -5,4 +5,4 @@
 /**
  * 警告类别。
  */
-export type WarningKind = "duplicate-id" | "prop-type-mismatch" | "unknown-component";
+export type WarningKind = "duplicate-id" | "prop-type-mismatch" | "unknown-component" | "unexpected-children";

@@ -7,8 +7,8 @@ import type { TableRowPick } from "./TableRowPick";
 /**
  * 事件载荷：按组件契约区分的固定形态（untagged，由结构区分）。
  *
- * - 纯文本：`"..."`（text-input 等）
+ * - 字符串载荷：`"..."`（text-input / select / radio-group 等）
  * - 表格行：`{ rowIndex, row }`
  * - 文件选择：`{ token, fileName, size }`（v0.3 决策 B3，design.md D5）
  */
-export type EventValue = string | number | boolean | string | TableRowPick | FilePickValue;
+export type EventValue = string | number | boolean | TableRowPick | FilePickValue;

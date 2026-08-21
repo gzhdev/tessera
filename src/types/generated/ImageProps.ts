@@ -7,7 +7,7 @@
  */
 export type ImageProps = { 
 /**
- * 图片来源（data URL 或宿主交付的 blob 标识，不含文件系统路径）。
+ * 图片来源（`data:` URI 或虚拟路径，设计书 §9.6）。
  */
 source: string, 
 /**

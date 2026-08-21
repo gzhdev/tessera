@@ -15,6 +15,11 @@ fn main() {
     let out_dir: PathBuf = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../src/types/generated");
     std::fs::create_dir_all(&out_dir).unwrap_or_else(|e| panic!("创建目录 {out_dir:?} 失败：{e}"));
 
+    // 先清空旧的生成物（保留 README.md）：类型删除 / 改名后残留的孤儿 .ts
+    // 不会被重新生成触碰，仅靠「重新生成 + git diff」检不出来——清空后
+    // 重新生成，孤儿文件以「未跟踪 / 已删除」形式显式出现。
+    clean_stale_outputs(&out_dir);
+
     // 安全：本进程独占该变量，且 export_all 是同步调用。
     unsafe {
         std::env::set_var("TS_RS_EXPORT_DIR", &out_dir);
@@ -33,6 +38,18 @@ fn main() {
 
     prepend_generated_banner(&out_dir);
     println!("已生成 TS 类型到 {out_dir:?}");
+}
+
+/// 清理过期生成物：删除目录内全部 `.ts`（README.md 等非生成文件保留）。
+fn clean_stale_outputs(dir: &Path) {
+    let entries = std::fs::read_dir(dir).unwrap_or_else(|e| panic!("读取目录 {dir:?} 失败：{e}"));
+    for entry in entries {
+        let entry = entry.unwrap_or_else(|e| panic!("读取目录项失败：{e}"));
+        let path = entry.path();
+        if path.extension().and_then(|s| s.to_str()) == Some("ts") {
+            std::fs::remove_file(&path).unwrap_or_else(|e| panic!("删除 {path:?} 失败：{e}"));
+        }
+    }
 }
 
 /// 给每个生成文件头部加「自动生成，勿手改」标注（ui-typegen spec 要求）。

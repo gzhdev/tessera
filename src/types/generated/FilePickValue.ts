@@ -21,4 +21,4 @@ fileName: string,
 /**
  * 字节数。
  */
-size: bigint, };
+size: number, };

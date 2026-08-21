@@ -4,7 +4,7 @@
 
 ## 1. 生成器选型验证（阻塞性）
 
-- [x] 1.1 用一个带枚举 props 的组件与一个带嵌套结构的组件试跑 `ts-rs` 生成。验证：产出的 TS 类型能被前端 `tsc` 接受，且联合类型的判别字段可用于收窄
+- [x] 1.1 用一个带枚举 props 的组件与一个带嵌套结构的组件试跑 `ts-rs` 生成。验证：产出的 TS 类型能被前端 `tsc` 接受，且联合类型的判别字段可用于收窄（tsc 探针为临时工件，验证后已删除）
 - [x] 1.2 若 1.1 产出不可用，按 design.md D1 的退路调整 Rust 侧类型表达（而非换生成器）。验证：调整后 1.1 的判定通过 —— **N/A**：1.1 产出即可用（`tsc --noEmit` exit=0，`@ts-expect-error` 收窄断言全部生效），未触发退路
 - [x] 1.3 选定生成命令的载体（倾向 `cargo xtask`，见 design.md Open Questions）。验证：一条命令可重复执行且产出稳定 —— 载体定为 `cargo run -p tessera-ui-schema --bin gen-types`（与既有 `gen-schema` 同惯例，基于 `CARGO_MANIFEST_DIR` 无 cwd 依赖）；两次执行 sha1 逐字节一致
 
@@ -24,7 +24,7 @@
 - [x] 3.3 实现未知类型节点的子树一并降级。验证：未知节点带 `children` 时整体降级，子树不被单独渲染 —— `validate.rs::unknown_type_degrades_whole_subtree`
 - [x] 3.4 实现同树内重复 `id` 的检出与警告，警告含重复值与位置。验证：两个节点同 `id` 时产生可定位的警告 —— `validate.rs::duplicate_id_is_warned_with_location`
 - [x] 3.5 实现属性类型不符的报告。验证：数值型属性被赋字符串时，校验指出该节点的该属性类型不符 —— `validate.rs::prop_type_mismatch_is_reported`
-- [x] 3.6 接通生成管线，产出 `src/types/generated/` 并 check-in，文件内标注「自动生成，勿手改」。验证：前端能仅凭生成的类型完成一次节点构造，无需手写任何契约类型 —— `src/types/generated/*.ts`（banner 标注）+ tsc 构造/拒绝探针 exit=0
+- [x] 3.6 接通生成管线，产出 `src/types/generated/` 并 check-in，文件内标注「自动生成，勿手改」。验证：前端能仅凭生成的类型完成一次节点构造，无需手写任何契约类型（tsc 构造/拒绝探针为临时工件，验证后已删除） —— `src/types/generated/*.ts`（banner 标注）+ tsc 构造/拒绝探针 exit=0
 - [x] 3.7 在 CI 中加入一致性检查。验证：改了 Rust 类型未重新生成时 CI 失败；直接手改生成产物时 CI 也失败 —— ci.yml 新增「UI 类型生成物一致性」步（重新生成 + `git diff --exit-code src/types/generated/`）；本地两路径（手改产物被 diff 检出 / 源产物一致 diff 为空）实测通过
 
 ## 4. 补齐组件清单

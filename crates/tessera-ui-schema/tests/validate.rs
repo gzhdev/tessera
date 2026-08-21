@@ -216,3 +216,128 @@ fn component_type_tags_match_design_doc() {
     );
     assert_eq!(Component::VStack(Default::default()).type_tag(), "vstack");
 }
+
+/// review #3：后代节点 id 形状错误（数字）只降级该节点，不连坐整树。
+#[test]
+fn malformed_id_degrades_only_that_node() {
+    let outcome = outcome_of(serde_json::json!({
+        "root": { "type": "vstack", "id": "r", "props": {},
+            "children": [
+                { "type": "vstack", "id": "c", "props": {},
+                  "children": [ { "type": "text", "id": 5, "props": { "text": "x" } } ] },
+                { "type": "text", "id": "ok", "props": { "text": "兄弟" } }
+            ] }
+    }));
+    assert!(outcome.is_usable(), "后代形状错误不应连坐整树");
+    assert_eq!(outcome.degraded.len(), 1, "只降级形状错误的节点");
+    let root = outcome.tree.unwrap().root;
+    assert_eq!(root.children.len(), 2, "中间容器与正常兄弟都保留");
+    assert_eq!(root.children[0].children.len(), 0, "坏孙节点被降级剔除");
+}
+
+/// review #3：`on` 的动作值非字符串只降级该节点。
+#[test]
+fn malformed_on_value_degrades_only_that_node() {
+    let outcome = outcome_of(serde_json::json!({
+        "root": { "type": "vstack", "id": "r", "props": {},
+            "children": [
+                { "type": "button", "id": "bad", "props": { "label": "x" },
+                  "on": { "click": 5 } },
+                { "type": "text", "id": "ok", "props": { "text": "兄弟" } }
+            ] }
+    }));
+    assert!(outcome.is_usable());
+    assert_eq!(outcome.degraded.len(), 1);
+    assert_eq!(outcome.degraded[0].node_id.as_deref(), Some("bad"));
+    assert_eq!(outcome.tree.unwrap().root.children.len(), 1);
+}
+
+/// review #3：`children` 非数组只降级该节点。
+#[test]
+fn malformed_children_degrades_only_that_node() {
+    let outcome = outcome_of(serde_json::json!({
+        "root": { "type": "vstack", "id": "r", "props": {},
+            "children": [
+                { "type": "vstack", "id": "bad", "props": {}, "children": "不是数组" },
+                { "type": "text", "id": "ok", "props": { "text": "兄弟" } }
+            ] }
+    }));
+    assert!(outcome.is_usable());
+    assert_eq!(outcome.degraded.len(), 1);
+    assert_eq!(outcome.tree.unwrap().root.children.len(), 1);
+}
+
+/// review #3：子节点缺 `type` 走节点级降级并进降级清单。
+#[test]
+fn child_missing_type_degrades_with_placeholder_tag() {
+    let outcome = outcome_of(serde_json::json!({
+        "root": { "type": "vstack", "id": "r", "props": {},
+            "children": [ { "id": "orphan" } ] }
+    }));
+    assert!(outcome.is_usable());
+    assert_eq!(outcome.degraded.len(), 1);
+    assert!(
+        outcome.degraded[0].type_tag.contains("type"),
+        "占位标记应指明 type 问题"
+    );
+    assert_eq!(outcome.tree.unwrap().root.children.len(), 0);
+}
+
+/// review #7：props 内枚举未知值归「属性类型不符」，不误标「未知组件」。
+#[test]
+fn unknown_enum_value_in_props_is_prop_mismatch() {
+    let outcome = outcome_of(serde_json::json!({
+        "root": { "type": "button", "id": "b", "props": { "label": "x", "variant": "weird" } }
+    }));
+    assert!(outcome.degraded.len() == 1);
+    let w = outcome
+        .warnings
+        .iter()
+        .find(|w| {
+            w.kind == WarningKind::UnknownComponent || w.kind == WarningKind::PropTypeMismatch
+        })
+        .expect("应有警告");
+    assert_eq!(
+        w.kind,
+        WarningKind::PropTypeMismatch,
+        "variant 未知值是属性错误，非未知组件"
+    );
+}
+
+/// review #7：白名单与组件枚举同步（宏单一事实源的行为验证）。
+#[test]
+fn known_type_whitelist_covers_all_variants() {
+    use tessera_ui_schema::Component;
+    // 已知标记能通过；未知标记不能
+    assert!(Component::is_known_type("vstack"));
+    assert!(Component::is_known_type("file-picker"));
+    assert!(!Component::is_known_type("flying-toaster"));
+    assert!(!Component::is_known_type("v-stack"));
+}
+
+/// review #14：非容器组件携带 children 产生警告（children 保留但提示不渲染）。
+#[test]
+fn non_container_with_children_warns() {
+    let outcome = outcome_of(serde_json::json!({
+        "root": { "type": "text", "id": "t", "props": { "text": "x" },
+                  "children": [ { "type": "text", "id": "c", "props": { "text": "子" } } ] }
+    }));
+    assert!(outcome.is_usable());
+    let w: Vec<_> = outcome
+        .warnings
+        .iter()
+        .filter(|w| w.kind == WarningKind::UnexpectedChildren)
+        .collect();
+    assert_eq!(w.len(), 1, "非容器携带 children 应产生一条警告");
+    assert!(w[0].message.contains("text"));
+    // 容器组件不产生该警告
+    let ok = outcome_of(serde_json::json!({
+        "root": { "type": "vstack", "id": "v", "props": {},
+                  "children": [ { "type": "text", "id": "c", "props": { "text": "子" } } ] }
+    }));
+    assert!(
+        !ok.warnings
+            .iter()
+            .any(|w| w.kind == WarningKind::UnexpectedChildren)
+    );
+}
