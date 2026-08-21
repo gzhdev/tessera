@@ -61,7 +61,9 @@
 
 **验证方式**：`tessera-manifest` 的**第一个测试**就是 `{"type": "fs.read", "virtualDirectory": "workspace"}` 必须报错。
 
-**退路（按优先级）**：
+**验证结果（2026-08-20，任务 1.1/1.2 落定）**：直接标注形态**实测生效**——serde 1.0.2xx 对 `#[serde(tag = "type", deny_unknown_fields)]` 的内部标记枚举正确拒绝未知字段，错误信息 `unknown field \`virtualDirectory\`, expected \`virtualDir\``。设计书担心的历史行为不一致在当前版本不存在，**未启用任何退路**，正式类型采用设计书 §4.3 的原始形态（enum 直接标注；variant 名用 `#[serde(rename)]`、字段用 `rename_all_fields = "camelCase"`）。未知字段错误的「上下文」由 `serde_path_to_error` 提供 JSON 路径前缀（如 `permissions[0]: unknown field ...`），满足 spec「哪个上下文中的哪个未知字段」的定位要求。探针测试保留在 `tests/serde_probe.rs`：A 断言直接标注生效（若未来 serde 退化则失败并提示启用退路），B 记录退路 1（variant 载荷独立 struct）同样有效，作为已验证的备选。
+
+**退路（按优先级，均未启用）**：
 1. 给每个 variant 的载荷抽成独立 struct 并单独标注 `deny_unknown_fields`
 2. 改用邻接标记（`#[serde(tag = "type", content = "scope")]`）——但这会改变清单的 JSON 形状，需要回到设计书 §4.1 改示例，成本高
 3. 手写 `Deserialize` 实现——最后手段

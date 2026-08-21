@@ -40,6 +40,11 @@ jobs:
       - name: 测试
         run: cargo test --workspace
 
+      - name: schema 生成物一致性（§4.3：plugin.schema.json 从类型生成，禁止手改）
+        run: |
+          cargo run -p tessera-manifest --bin gen-schema
+          git diff --exit-code -- crates/tessera-manifest/schema/
+
       - name: 依赖方向硬性检查（§17.1 约束 1/2）
         run: bash scripts/check-deps.sh
 

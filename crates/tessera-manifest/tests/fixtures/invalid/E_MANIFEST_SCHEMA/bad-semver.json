@@ -1,0 +1,24 @@
+{
+  "manifest": {
+    "manifestVersion": 1,
+    "id": "com.example.myplugin",
+    "name": "My Plugin",
+    "version": "1.2",
+    "engines": {
+      "core": 1,
+      "pluginApi": "^0.2.0"
+    },
+    "main": "plugin.wasm",
+    "activationEvents": [
+      "onCommand:run"
+    ],
+    "contributes": {
+      "commands": [
+        {
+          "id": "run",
+          "title": "运行"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "manifest": {
+    "manifestVersion": 1,
+    "id": "com.example.myplugin",
+    "name": "My Plugin",
+    "version": "1.2.0",
+    "description": "一句话说明插件做什么",
+    "author": "Example Inc.",
+    "license": "MIT",
+    "engines": {
+      "core": 1,
+      "pluginApi": "^0.2.0"
+    },
+    "main": "plugin.wasm",
+    "icon": "icon.svg",
+    "activationEvents": [
+      "onCommand:com.example.myplugin.run",
+      "onView:com.example.myplugin.panel"
+    ],
+    "permissions": [
+      { "type": "fs.read",  "virtualDir": "workspace" },
+      { "type": "fs.write", "virtualDir": "plugin-data" },
+      { "type": "net.http", "allowedDomains": ["api.example.com", "*.cdn.example.com"] },
+      { "type": "net.private", "allowedDomains": ["gitlab.internal", "10.0.0.5"] },
+      { "type": "events.subscribe", "topics": ["core/workspace-changed"] },
+      { "type": "command.invoke", "targets": ["com.example.other.format"] }
+    ],
+    "dependencies": {
+      "com.example.other": "^1.0.0"
+    },
+    "contributes": {
+      "commands": [
+        { "id": "run", "title": "运行我的插件", "icon": "play", "category": "My Plugin" }
+      ],
+      "menus": {
+        "toolbar":      [{ "command": "run", "group": "navigation", "order": 10 }],
+        "view/title":   [{ "command": "run", "when": "view == com.example.myplugin.panel" }],
+        "context":      []
+      },
+      "views": [
+        { "id": "panel", "name": "My Panel", "location": "right", "icon": "layers", "order": 20, "kind": "declarative" }
+      ],
+      "keybindings": [
+        { "command": "run", "key": "ctrl+alt+r", "mac": "cmd+alt+r" }
+      ],
+      "configuration": {
+        "title": "My Plugin",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "default": "https://api.example.com",
+            "description": "后端接口地址"
+          },
+          "maxRetries": {
+            "type": "integer", "default": 3, "minimum": 0, "maximum": 10,
+            "description": "失败重试次数"
+          },
+          "apiKey": {
+            "type": "string", "default": "", "sensitive": true,
+            "description": "接口密钥（明文存储，见 §11.5）"
+          }
+        }
+      },
+      "eventSubscriptions": ["core/workspace-changed"]
+    }
+  },
+  "registeredVdirs": ["workspace", "plugin-data"]
+}

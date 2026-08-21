@@ -1,0 +1,15 @@
+{
+  "plugins": [
+    {
+      "id": "com.a",
+      "version": "1.0.0",
+      "dependencies": {
+        "com.b": "^2.0.0"
+      }
+    },
+    {
+      "id": "com.b",
+      "version": "1.5.0"
+    }
+  ]
+}

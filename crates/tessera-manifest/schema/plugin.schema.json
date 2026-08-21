@@ -1,0 +1,586 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PluginManifest",
+  "description": "清单顶层结构。文件名固定为 `plugin.json`（§4.1）。",
+  "type": "object",
+  "properties": {
+    "activationEvents": {
+      "description": "非空；语法在反序列化时校验，引用存在性在流水线步骤 9 校验。",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ActivationEvent"
+      }
+    },
+    "author": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "contributes": {
+      "$ref": "#/$defs/Contributes"
+    },
+    "dependencies": {
+      "description": "key 为依赖插件的 id，不得含自身（自环检查在依赖图，E_DEPS_CYCLE）。",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z0-9]+(\\.[a-z0-9-]+)+$": {
+          "$ref": "#/$defs/SemverRange"
+        }
+      }
+    },
+    "description": {
+      "description": "长度 ≤ 256。",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "engines": {
+      "$ref": "#/$defs/Engines"
+    },
+    "icon": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "$ref": "#/$defs/PluginId"
+    },
+    "license": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "main": {
+      "description": "相对插件目录的 wasm 路径，语法与存在性校验见流水线步骤 6。",
+      "type": "string"
+    },
+    "manifestVersion": {
+      "description": "清单结构版本，当前仅接受 `1`（§4.2）。取值检查在流水线步骤 3。",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "name": {
+      "description": "展示名，长度 ≤ 64。",
+      "type": "string"
+    },
+    "permissions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Permission"
+      }
+    },
+    "version": {
+      "description": "严格 SemVer 2.0.0。",
+      "$ref": "#/$defs/StrictVersion"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "manifestVersion",
+    "id",
+    "name",
+    "version",
+    "engines",
+    "main",
+    "activationEvents"
+  ],
+  "$defs": {
+    "ActivationEvent": {
+      "description": "激活事件（§3.4）：onCommand:{id} / onView:{id} / onEvent:{topic} / onStartup / *",
+      "type": "string",
+      "pattern": "^(onCommand:.+|onView:.+|onEvent:.+|onStartup|\\*)$"
+    },
+    "CommandContribution": {
+      "description": "命令贡献。`id` 写局部名，注册时拼为全限定 id（§4.2）。",
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "icon": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/LocalName"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title"
+      ]
+    },
+    "ConfigType": {
+      "description": "配置项类型（§11.1 支持的 6 种）。",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "string",
+            "integer",
+            "number",
+            "boolean"
+          ]
+        },
+        {
+          "description": "JSON 写作 `\"string[]\"`。",
+          "type": "string",
+          "const": "string[]"
+        },
+        {
+          "description": "渲染为下拉选择。",
+          "type": "string",
+          "const": "enum"
+        }
+      ]
+    },
+    "Configuration": {
+      "description": "配置项 schema（§11.1）。设置面板要在插件激活前就能显示，必须声明式。",
+      "type": "object",
+      "properties": {
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/ConfigurationProperty"
+          }
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "properties"
+      ]
+    },
+    "ConfigurationProperty": {
+      "description": "单个配置项。`default` 必填（§11.1）；`sensitive: true` 表示密码框呈现与日志脱敏。",
+      "type": "object",
+      "properties": {
+        "default": {
+          "description": "必填——serde 层面无默认即必填，缺失直接解析失败。"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "maximum": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "minimum": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "sensitive": {
+          "type": "boolean"
+        },
+        "type": {
+          "$ref": "#/$defs/ConfigType"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "default"
+      ]
+    },
+    "Contributes": {
+      "description": "`contributes` 容器。全部子项可省略（§4.1 示例未写全也合法）。",
+      "type": "object",
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CommandContribution"
+          }
+        },
+        "configuration": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Configuration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "eventSubscriptions": {
+          "description": "声明式事件订阅；额外作用是驱动 `onEvent:` 懒激活（§6.1）。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "keybindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Keybinding"
+          }
+        },
+        "menus": {
+          "description": "挂载位合法 key：`toolbar` / `context` / `view/title` / `main/{菜单名}`（§6.1）。",
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/MenuEntry"
+            }
+          }
+        },
+        "views": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ViewContribution"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Engines": {
+      "description": "三条版本线中的两条载体（§13.1；`manifestVersion` 在顶层）。",
+      "type": "object",
+      "properties": {
+        "core": {
+          "description": "插件要求的最低宿主能力级别，正整数。与应用 SemVer 解耦（§13.1 决策 A5）。",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "pluginApi": {
+          "description": "WIT world 版本区间（如 `^0.2.0`）。",
+          "$ref": "#/$defs/SemverRange"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "core",
+        "pluginApi"
+      ]
+    },
+    "Keybinding": {
+      "description": "快捷键。冲突时后注册者被丢弃并记 warning，不拖垮插件（§6.2）。",
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "mac": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "key"
+      ]
+    },
+    "LocalName": {
+      "description": "contributes 内的局部名（注册时由宿主拼接为全限定 id）",
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z][a-zA-Z0-9-]*(\\.[a-zA-Z][a-zA-Z0-9-]*)*$"
+    },
+    "MenuEntry": {
+      "description": "菜单项。`command` 引用可写局部名（本插件）或全限定名（他插件），§4.2。",
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "group": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "order": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "when": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "command"
+      ]
+    },
+    "Permission": {
+      "description": "权限声明。`type` 内部标记 + `deny_unknown_fields`（serde 行为已由\n`tests/serde_probe.rs` 探针 A 验证生效，见 design.md D3）。\n\n三种 `net.*` 互不隐含（§7.1）：需要什么写什么。",
+      "oneOf": [
+        {
+          "description": "按虚拟目录别名授予读。",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "fs.read"
+            },
+            "virtualDir": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "virtualDir"
+          ]
+        },
+        {
+          "description": "按虚拟目录别名授予写。",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "fs.write"
+            },
+            "virtualDir": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "virtualDir"
+          ]
+        },
+        {
+          "description": "https + 公网 IP，域名白名单。",
+          "type": "object",
+          "properties": {
+            "allowedDomains": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "net.http"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "allowedDomains"
+          ]
+        },
+        {
+          "description": "额外允许 http 明文；IP 仍须公网。",
+          "type": "object",
+          "properties": {
+            "allowedDomains": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "net.insecure"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "allowedDomains"
+          ]
+        },
+        {
+          "description": "额外允许私有网段；协议仍须 https。",
+          "type": "object",
+          "properties": {
+            "allowedDomains": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "net.private"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "allowedDomains"
+          ]
+        },
+        {
+          "description": "topic 必须在本插件命名空间下。",
+          "type": "object",
+          "properties": {
+            "topics": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "events.publish"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "topics"
+          ]
+        },
+        {
+          "description": "支持 `ns/*` 通配。",
+          "type": "object",
+          "properties": {
+            "topics": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "events.subscribe"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "topics"
+          ]
+        },
+        {
+          "description": "目标为全限定 command id，支持 `{plugin_id}.*`。",
+          "type": "object",
+          "properties": {
+            "targets": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "command.invoke"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "targets"
+          ]
+        }
+      ]
+    },
+    "PluginId": {
+      "description": "反向域名格式的插件 id（如 com.example.myplugin）",
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^[a-z0-9]+(\\.[a-z0-9-]+)+$"
+    },
+    "SemverRange": {
+      "description": "SemVer 版本区间",
+      "type": "string",
+      "examples": [
+        "^0.2.0",
+        ">=1.0.0 <2.0.0"
+      ]
+    },
+    "StrictVersion": {
+      "description": "严格 SemVer 2.0.0（如 1.2.0）",
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "ViewContribution": {
+      "description": "视图贡献（停靠面板）。必须声明式——预注册（灰态）依赖于此（§6.1）。",
+      "type": "object",
+      "properties": {
+        "icon": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/LocalName"
+        },
+        "kind": {
+          "description": "省略时取默认值 `declarative`。",
+          "$ref": "#/$defs/ViewKind",
+          "default": "declarative"
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "order": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "ViewKind": {
+      "description": "视图种类（§6.1/§9.6）：当前仅声明式；`webview` 等为未来逃生舱，出现即拒绝。",
+      "oneOf": [
+        {
+          "description": "声明式 UI 描述树。省略 `kind` 时的默认值。",
+          "type": "string",
+          "const": "declarative"
+        }
+      ]
+    }
+  }
+}
