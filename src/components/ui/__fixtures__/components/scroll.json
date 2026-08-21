@@ -1,0 +1,18 @@
+{
+  "root": {
+    "type": "scroll",
+    "id": "s",
+    "props": {
+      "maxHeight": 120
+    },
+    "children": [
+      {
+        "type": "text",
+        "id": "s1",
+        "props": {
+          "text": "滚动内容"
+        }
+      }
+    ]
+  }
+}

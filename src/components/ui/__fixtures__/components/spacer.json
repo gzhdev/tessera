@@ -1,0 +1,30 @@
+{
+  "root": {
+    "type": "vstack",
+    "id": "v",
+    "props": {},
+    "children": [
+      {
+        "type": "text",
+        "id": "a",
+        "props": {
+          "text": "上"
+        }
+      },
+      {
+        "type": "spacer",
+        "id": "sp",
+        "props": {
+          "size": 16
+        }
+      },
+      {
+        "type": "text",
+        "id": "b",
+        "props": {
+          "text": "下"
+        }
+      }
+    ]
+  }
+}

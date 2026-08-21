@@ -1,0 +1,26 @@
+{
+  "root": {
+    "type": "grid",
+    "id": "g",
+    "props": {
+      "columns": 2,
+      "gap": 4
+    },
+    "children": [
+      {
+        "type": "text",
+        "id": "g1",
+        "props": {
+          "text": "单元1"
+        }
+      },
+      {
+        "type": "text",
+        "id": "g2",
+        "props": {
+          "text": "单元2"
+        }
+      }
+    ]
+  }
+}

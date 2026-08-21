@@ -1,0 +1,10 @@
+{
+  "root": {
+    "type": "alert",
+    "id": "a",
+    "props": {
+      "message": "注意磁盘空间",
+      "tone": "warning"
+    }
+  }
+}

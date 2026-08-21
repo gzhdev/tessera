@@ -1,0 +1,14 @@
+{
+  "root": {
+    "type": "textarea",
+    "id": "ta",
+    "props": {
+      "placeholder": "多行输入",
+      "value": "第一行",
+      "rows": 3
+    },
+    "on": {
+      "change": "set-notes"
+    }
+  }
+}

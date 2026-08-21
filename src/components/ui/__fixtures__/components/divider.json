@@ -1,0 +1,9 @@
+{
+  "root": {
+    "type": "divider",
+    "id": "d",
+    "props": {
+      "direction": "horizontal"
+    }
+  }
+}

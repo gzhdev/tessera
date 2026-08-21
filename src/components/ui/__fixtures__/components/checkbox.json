@@ -1,0 +1,13 @@
+{
+  "root": {
+    "type": "checkbox",
+    "id": "c",
+    "props": {
+      "label": "启用",
+      "checked": true
+    },
+    "on": {
+      "change": "toggle"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "root": {
+    "type": "progress",
+    "id": "p",
+    "props": {
+      "value": 0.4,
+      "label": "同步中"
+    }
+  }
+}

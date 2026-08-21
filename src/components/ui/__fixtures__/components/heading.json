@@ -1,0 +1,10 @@
+{
+  "root": {
+    "type": "heading",
+    "id": "h",
+    "props": {
+      "text": "同步状态",
+      "level": 3
+    }
+  }
+}

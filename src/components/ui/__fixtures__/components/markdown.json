@@ -1,0 +1,9 @@
+{
+  "root": {
+    "type": "markdown",
+    "id": "md",
+    "props": {
+      "source": "# 标题\n\n- 甲\n- 乙\n\n**强调** 与 [链接](https://example.com)"
+    }
+  }
+}

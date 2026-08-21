@@ -1,0 +1,9 @@
+{
+  "root": {
+    "type": "spinner",
+    "id": "s",
+    "props": {
+      "label": "加载中"
+    }
+  }
+}

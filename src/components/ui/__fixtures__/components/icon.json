@@ -1,0 +1,10 @@
+{
+  "root": {
+    "type": "icon",
+    "id": "i",
+    "props": {
+      "name": "file",
+      "size": 16
+    }
+  }
+}

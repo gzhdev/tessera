@@ -1,0 +1,10 @@
+{
+  "root": {
+    "type": "code",
+    "id": "c",
+    "props": {
+      "code": "fn main() { let x = 1; }",
+      "language": "rust"
+    }
+  }
+}

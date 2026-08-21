@@ -1,0 +1,5 @@
+{ "root": { "type": "vstack", "id": "v", "props": { "gap": 8, "padding": 12 },
+  "children": [
+    { "type": "text", "id": "a", "props": { "text": "甲" } },
+    { "type": "text", "id": "b", "props": { "text": "乙" } }
+  ] } }

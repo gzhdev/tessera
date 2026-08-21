@@ -1,0 +1,2 @@
+{ "root": { "type": "button", "id": "sync", "props": { "label": "立即同步", "variant": "primary", "disabled": false },
+  "on": { "click": "do-sync" } } }

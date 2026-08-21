@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
@@ -11,5 +12,10 @@ export default defineConfig({
   },
   build: {
     target: 'es2022',
+  },
+  test: {
+    environment: 'jsdom',
+    // 组件库测试集中在 src/components/ui 下；快照内联于测试文件
+    include: ['src/**/*.test.ts'],
   },
 })

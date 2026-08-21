@@ -1,0 +1,96 @@
+{
+  "root": {
+    "type": "vstack", "id": "root", "props": { "gap": 8, "padding": 12 },
+    "children": [
+      { "type": "vstack", "id": "c-vstack", "props": { "gap": 4, "padding": 8 },
+        "children": [
+          { "type": "text", "id": "c-vstack-text", "props": { "text": "内层 vstack" } }
+        ] },
+      { "type": "hstack", "id": "c-hstack", "props": { "gap": 4, "padding": 8 },
+        "children": [
+          { "type": "text", "id": "c-hstack-text", "props": { "text": "内层 hstack" } }
+        ] },
+      { "type": "text", "id": "c-text", "props": { "text": "普通文本", "muted": true } },
+      { "type": "button", "id": "c-button", "props": { "label": "立即同步", "variant": "primary", "disabled": false },
+        "on": { "click": "do-sync" } },
+      { "type": "text-input", "id": "c-text-input", "props": { "placeholder": "输入端点", "value": "https://api.example.com", "forceValue": false, "debounce": 300 },
+        "on": { "change": "set-endpoint" } },
+      { "type": "table", "id": "c-table", "props": {
+          "columns": [
+            { "key": "name", "title": "文件名", "width": "2fr" },
+            { "key": "status", "title": "状态", "width": "1fr" }
+          ],
+          "rows": [
+            { "name": "a.txt", "status": "已同步" },
+            { "name": "b.txt", "status": "待处理" }
+          ]
+        },
+        "on": { "rowClick": "open-file" } },
+      { "type": "grid", "id": "c-grid", "props": { "columns": 2, "gap": 4 },
+        "children": [
+          { "type": "text", "id": "c-grid-text", "props": { "text": "网格单元" } }
+        ] },
+      { "type": "scroll", "id": "c-scroll", "props": { "maxHeight": 120 },
+        "children": [
+          { "type": "text", "id": "c-scroll-text", "props": { "text": "滚动区" } }
+        ] },
+      { "type": "tabs", "id": "c-tabs", "props": { "labels": ["页一", "页二"], "active": 0 },
+        "children": [
+          { "type": "text", "id": "c-tabs-1", "props": { "text": "第一页" } },
+          { "type": "text", "id": "c-tabs-2", "props": { "text": "第二页" } }
+        ] },
+      { "type": "group", "id": "c-group", "props": { "title": "分组", "collapsible": true },
+        "children": [
+          { "type": "text", "id": "c-group-text", "props": { "text": "分组内容" } }
+        ] },
+      { "type": "spacer", "id": "c-spacer", "props": { "size": 16 } },
+      { "type": "split", "id": "c-split", "props": { "direction": "horizontal", "ratio": 0.5 },
+        "children": [
+          { "type": "text", "id": "c-split-a", "props": { "text": "左" } },
+          { "type": "text", "id": "c-split-b", "props": { "text": "右" } }
+        ] },
+      { "type": "heading", "id": "c-heading", "props": { "text": "同步状态", "level": 3 } },
+      { "type": "badge", "id": "c-badge", "props": { "text": "正常", "tone": "success" } },
+      { "type": "divider", "id": "c-divider", "props": { "direction": "horizontal" } },
+      { "type": "icon", "id": "c-icon", "props": { "name": "file", "size": 16 } },
+      { "type": "markdown", "id": "c-markdown", "props": { "source": "# 标题\n\n正文 **强调** [链接](https://example.com)" } },
+      { "type": "code", "id": "c-code", "props": { "code": "fn main() {}", "language": "rust" } },
+      { "type": "image", "id": "c-image", "props": { "source": "data:image/gif;base64,R0lGODlhAQABAAAAACw=", "alt": "占位图", "width": 16 } },
+      { "type": "empty-state", "id": "c-empty-state", "props": { "message": "暂无数据", "icon": "inbox" } },
+      { "type": "textarea", "id": "c-textarea", "props": { "placeholder": "多行输入", "value": "第一行", "rows": 3 },
+        "on": { "change": "set-notes" } },
+      { "type": "number-input", "id": "c-number-input", "props": { "value": 2, "min": 0, "max": 10, "step": 1 },
+        "on": { "change": "set-count" } },
+      { "type": "select", "id": "c-select", "props": {
+          "options": [ { "value": "a", "label": "甲" }, { "value": "b", "label": "乙" } ],
+          "value": "a", "placeholder": "请选择"
+        },
+        "on": { "change": "set-choice" } },
+      { "type": "checkbox", "id": "c-checkbox", "props": { "label": "启用", "checked": true },
+        "on": { "change": "toggle" } },
+      { "type": "radio-group", "id": "c-radio-group", "props": {
+          "options": [ { "value": "x", "label": "小" }, { "value": "y", "label": "大" } ],
+          "value": "x"
+        },
+        "on": { "change": "set-size" } },
+      { "type": "switch", "id": "c-switch", "props": { "label": "开关", "on": false },
+        "on": { "change": "flip" } },
+      { "type": "slider", "id": "c-slider", "props": { "min": 0, "max": 100, "value": 40, "step": 5 },
+        "on": { "change": "slide" } },
+      { "type": "file-picker", "id": "c-file-picker", "props": { "label": "选择 CSV", "accept": ["csv"] },
+        "on": { "pick": "load-csv" } },
+      { "type": "list", "id": "c-list", "props": {
+          "items": [ { "title": "甲", "subtitle": "说明", "icon": "file" }, { "title": "乙" } ]
+        } },
+      { "type": "tree", "id": "c-tree", "props": {
+          "nodes": [ { "label": "根", "children": [ { "label": "子" } ] } ]
+        } },
+      { "type": "key-value", "id": "c-key-value", "props": {
+          "entries": [ { "key": "版本", "value": "1.0" } ]
+        } },
+      { "type": "alert", "id": "c-alert", "props": { "message": "注意磁盘空间", "tone": "warning" } },
+      { "type": "progress", "id": "c-progress", "props": { "value": 0.4, "label": "同步中" } },
+      { "type": "spinner", "id": "c-spinner", "props": { "label": "加载中" } }
+    ]
+  }
+}

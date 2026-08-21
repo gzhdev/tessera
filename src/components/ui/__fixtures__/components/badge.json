@@ -1,0 +1,10 @@
+{
+  "root": {
+    "type": "badge",
+    "id": "b",
+    "props": {
+      "text": "正常",
+      "tone": "success"
+    }
+  }
+}

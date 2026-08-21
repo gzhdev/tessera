@@ -1,0 +1,15 @@
+{
+  "root": {
+    "type": "vstack", "id": "l1", "props": { "gap": 4 },
+    "children": [
+      { "type": "hstack", "id": "l2", "props": { "gap": 2 },
+        "children": [
+          { "type": "vstack", "id": "l3", "props": { "gap": 1 },
+            "children": [
+              { "type": "text", "id": "leaf-a", "props": { "text": "叶甲" } },
+              { "type": "text", "id": "leaf-b", "props": { "text": "叶乙" } }
+            ] }
+        ] }
+    ]
+  }
+}

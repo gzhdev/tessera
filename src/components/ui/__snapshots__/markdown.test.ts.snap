@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`markdown 组件 > 快照 1`] = `
+"<!-- html 由受限解析器产出，其中 HTML 已转义为字面文本 -->
+<div class="ui-markdown">
+  <h1>标题</h1>
+  <ul>
+    <li>甲</li>
+    <li>乙</li>
+  </ul>
+  <p><strong>强调</strong> 与 <a href="https://example.com" data-md-link="1">链接</a></p>
+</div>"
+`;

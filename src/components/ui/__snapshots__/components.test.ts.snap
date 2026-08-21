@@ -1,0 +1,131 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`第一批组件快照（任务 4.1） > alert 1`] = `"<div class="ui-alert ui-alert--warning" role="alert">注意磁盘空间</div>"`;
+
+exports[`第一批组件快照（任务 4.1） > badge 1`] = `"<span class="ui-badge ui-badge--success">正常</span>"`;
+
+exports[`第一批组件快照（任务 4.1） > button（primary） 1`] = `"<button type="button" class="ui-button ui-button--primary">立即同步</button>"`;
+
+exports[`第一批组件快照（任务 4.1） > checkbox 1`] = `"<label class="ui-checkbox"><input type="checkbox" checked=""><span>启用</span></label>"`;
+
+exports[`第一批组件快照（任务 4.1） > divider 1`] = `"<hr class="ui-divider ui-divider--horizontal" aria-orientation="horizontal">"`;
+
+exports[`第一批组件快照（任务 4.1） > empty-state 1`] = `
+"<div class="ui-empty-state"><span class="ui-empty-state__icon" data-icon="inbox"></span>
+  <p class="ui-empty-state__message">暂无数据</p>
+</div>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > grid 1`] = `"<div class="ui-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px;"><span class="ui-text">单元1</span><span class="ui-text">单元2</span></div>"`;
+
+exports[`第一批组件快照（任务 4.1） > group 1`] = `
+"<section class="ui-group">
+  <header class="ui-group__header ui-group__header--collapsible"><span class="ui-group__caret">▾</span> 分组标题</header>
+  <div class="ui-group__body"><span class="ui-text">分组内容</span></div>
+</section>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > heading 1`] = `"<h3 class="ui-heading">同步状态</h3>"`;
+
+exports[`第一批组件快照（任务 4.1） > hstack 1`] = `"<div class="ui-hstack" style="display: flex; flex-direction: row; align-items: center; gap: 6px;"><button type="button" class="ui-button ui-button--default">确定</button><button type="button" class="ui-button ui-button--default">取消</button></div>"`;
+
+exports[`第一批组件快照（任务 4.1） > icon 1`] = `
+"<!-- 图标以名称标识，宿主映射到具体字形；占位渲染保留语义与尺寸。 -->
+<span class="ui-icon" data-icon="file" style="width: 16px; height: 16px; font-size: 16px;" role="img" aria-label="file"></span>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > key-value 1`] = `
+"<dl class="ui-key-value">
+  <dt class="ui-key-value__key">版本</dt>
+  <dd class="ui-key-value__value">1.0</dd>
+  <dt class="ui-key-value__key">作者</dt>
+  <dd class="ui-key-value__value">Tessera</dd>
+</dl>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > list 1`] = `
+"<ul class="ui-list" style="overflow-y: auto;">
+  <li class="ui-list-item"><span class="ui-list-item__title">甲</span><span class="ui-list-item__subtitle">说明</span></li>
+  <li class="ui-list-item"><span class="ui-list-item__title">乙</span>
+    <!--v-if-->
+  </li>
+</ul>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > number-input 1`] = `"<input type="number" class="ui-number-input" min="0" max="10" step="1" value="2">"`;
+
+exports[`第一批组件快照（任务 4.1） > progress 1`] = `"<div class="ui-progress"><progress class="ui-progress__bar" max="100" value="40">40%</progress><span class="ui-progress__label">同步中</span></div>"`;
+
+exports[`第一批组件快照（任务 4.1） > radio-group 1`] = `"<div class="ui-radio-group" role="radiogroup"><label class="ui-radio"><input type="radio" name="radio-rg" checked="" value="x"><span>小</span></label><label class="ui-radio"><input type="radio" name="radio-rg" value="y"><span>大</span></label></div>"`;
+
+exports[`第一批组件快照（任务 4.1） > scroll 1`] = `"<div class="ui-scroll" style="overflow-y: auto; max-height: 120px;"><span class="ui-text">滚动内容</span></div>"`;
+
+exports[`第一批组件快照（任务 4.1） > select 1`] = `
+"<select class="ui-select" value="a">
+  <option disabled="" value="">请选择</option>
+  <option value="a">甲</option>
+  <option value="b">乙</option>
+</select>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > slider 1`] = `"<input type="range" class="ui-slider" min="0" max="100" step="5" value="40">"`;
+
+exports[`第一批组件快照（任务 4.1） > spacer 1`] = `
+"<div class="ui-vstack" style="display: flex; flex-direction: column;"><span class="ui-text">上</span>
+  <div class="ui-spacer" style="width: 16px; height: 16px; flex-shrink: 0;" aria-hidden="true"></div><span class="ui-text">下</span>
+</div>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > spinner 1`] = `"<div class="ui-spinner" role="status"><span class="ui-spinner__dot" aria-hidden="true"></span><span class="ui-spinner__label">加载中</span></div>"`;
+
+exports[`第一批组件快照（任务 4.1） > split 1`] = `
+"<div class="ui-split ui-split--horizontal" style="display: flex; flex-direction: row;">
+  <div class="ui-split__pane" style="flex-grow: 0.5; flex-basis: 0px;"><span class="ui-text">左</span></div>
+  <div class="ui-split__pane" style="flex-grow: 0.5; flex-basis: 0px;"><span class="ui-text">右</span></div>
+</div>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > switch 1`] = `"<label class="ui-switch"><input type="checkbox" role="switch"><span>开关</span></label>"`;
+
+exports[`第一批组件快照（任务 4.1） > table 1`] = `
+"<table class="ui-table">
+  <thead>
+    <tr>
+      <th>文件名</th>
+      <th>状态</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>a.txt</td>
+      <td>已同步</td>
+    </tr>
+    <tr>
+      <td>b.txt</td>
+      <td>待处理</td>
+    </tr>
+  </tbody>
+</table>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > tabs 1`] = `
+"<div class="ui-tabs">
+  <div class="ui-tabs__bar" role="tablist"><button type="button" role="tab" aria-selected="true" class="ui-tabs__tab ui-tabs__tab--active">页一</button><button type="button" role="tab" aria-selected="false" class="ui-tabs__tab">页二</button></div><!-- 第 i 个页签对应第 i 个 child；只渲染活动页 -->
+  <div class="ui-tabs__panel"><span class="ui-text">第一页</span></div>
+</div>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > textarea 1`] = `"<textarea class="ui-textarea" placeholder="多行输入" rows="3" value="第一行"></textarea>"`;
+
+exports[`第一批组件快照（任务 4.1） > text（muted） 1`] = `"<span class="ui-text ui-text--muted">普通文本</span>"`;
+
+exports[`第一批组件快照（任务 4.1） > tree 1`] = `
+"<ul class="ui-tree">
+  <li class="ui-tree__node">
+    <div class="ui-tree__label ui-tree__label--branch"><span class="ui-tree__caret">▸</span> 根</div>
+    <!--v-if-->
+  </li>
+</ul>"
+`;
+
+exports[`第一批组件快照（任务 4.1） > vstack 1`] = `"<div class="ui-vstack" style="display: flex; flex-direction: column; gap: 8px; padding: 12px;"><span class="ui-text">甲</span><span class="ui-text">乙</span></div>"`;

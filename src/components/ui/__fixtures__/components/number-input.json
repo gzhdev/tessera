@@ -1,0 +1,15 @@
+{
+  "root": {
+    "type": "number-input",
+    "id": "ni",
+    "props": {
+      "value": 2,
+      "min": 0,
+      "max": 10,
+      "step": 1
+    },
+    "on": {
+      "change": "set-count"
+    }
+  }
+}

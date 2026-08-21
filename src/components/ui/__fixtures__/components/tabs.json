@@ -1,0 +1,29 @@
+{
+  "root": {
+    "type": "tabs",
+    "id": "t",
+    "props": {
+      "labels": [
+        "页一",
+        "页二"
+      ],
+      "active": 0
+    },
+    "children": [
+      {
+        "type": "text",
+        "id": "t1",
+        "props": {
+          "text": "第一页"
+        }
+      },
+      {
+        "type": "text",
+        "id": "t2",
+        "props": {
+          "text": "第二页"
+        }
+      }
+    ]
+  }
+}

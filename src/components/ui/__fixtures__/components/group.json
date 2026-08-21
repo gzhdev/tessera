@@ -1,0 +1,19 @@
+{
+  "root": {
+    "type": "group",
+    "id": "g",
+    "props": {
+      "title": "分组标题",
+      "collapsible": true
+    },
+    "children": [
+      {
+        "type": "text",
+        "id": "g1",
+        "props": {
+          "text": "分组内容"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "root": {
+    "type": "empty-state",
+    "id": "e",
+    "props": {
+      "message": "暂无数据",
+      "icon": "inbox"
+    }
+  }
+}

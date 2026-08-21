@@ -104,3 +104,16 @@
 
 - 组件的视觉样式体系（设计 token、暗色主题）尚未定。它不影响任何 spec 中的行为要求，可以先用最朴素的样式把行为跑通，样式统一在第二批或后续单独处理。
 - 事件 handler 的注入方式（provide/inject vs props vs store）。三者都能满足「可注入」这一要求，等 `core-ui-bridge` 接入时的实际形状明确后再定更稳妥。
+
+## 选型记录（任务 6.1 / 6.4 落地时补记）
+
+- **markdown 解析库：`marked` 18.0.10**（2026-08-21 选定）。`marked.esm.js` 原始 43,018 B，
+  gzip 后约 12.9 KB。HTML 转义在组件内固定实现——renderer 层把 `html` token 转义为纯文本，
+  插件侧无任何开关可打开 HTML 解释（满足 D6「默认转义、不靠配置项」：配置入口不暴露给插件）。
+- **code 语法高亮：`highlight.js` 11.12.0 core + 按需注册语言**（2026-08-21 选定）。core 76,324 B（gzip 约 22.4 KB），单语言数 KB（rust 6,308 B / gzip 2.0 KB，typescript gzip 6.7 KB，javascript gzip 5.6 KB，json gzip 0.9 KB）。当前注册：rust / typescript / javascript / json / toml(ini) / bash / yaml，均为 fixture 实际用到的语言；新增语言追加一行 registerLanguage 即可，未注册语言回退为转义纯文本。全量包（5.5 MB）不引入。
+
+## 测量记录（任务 7.2）
+
+- **大表格**：`__fixtures__/big-table.json`（500 行 × 3 列）在 jsdom 下渲染 113.9ms
+  （DOM 构造 + vdom 开销下界参考；jsdom 无布局绘制）。低于「明显卡顿」阈值，
+  未引入虚拟滚动——契约不变（符合任务 7.2「不改契约」的既定边界）。

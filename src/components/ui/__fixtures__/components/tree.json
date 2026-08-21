@@ -1,0 +1,18 @@
+{
+  "root": {
+    "type": "tree",
+    "id": "t",
+    "props": {
+      "nodes": [
+        {
+          "label": "根",
+          "children": [
+            {
+              "label": "子"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

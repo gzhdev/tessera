@@ -1,0 +1,22 @@
+{
+  "root": {
+    "type": "radio-group",
+    "id": "rg",
+    "props": {
+      "options": [
+        {
+          "value": "x",
+          "label": "小"
+        },
+        {
+          "value": "y",
+          "label": "大"
+        }
+      ],
+      "value": "x"
+    },
+    "on": {
+      "change": "set-size"
+    }
+  }
+}

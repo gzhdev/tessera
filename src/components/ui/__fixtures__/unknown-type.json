@@ -1,0 +1,17 @@
+{
+  "root": {
+    "type": "vstack", "id": "root", "props": {},
+    "children": [
+      { "type": "text", "id": "ok-1", "props": { "text": "正常1" } },
+      { "type": "text", "id": "ok-2", "props": { "text": "正常2" } },
+      { "type": "text", "id": "ok-3", "props": { "text": "正常3" } },
+      { "type": "text", "id": "ok-4", "props": { "text": "正常4" } },
+      { "type": "text", "id": "ok-5", "props": { "text": "正常5" } },
+      { "type": "text", "id": "ok-6", "props": { "text": "正常6" } },
+      { "type": "text", "id": "ok-7", "props": { "text": "正常7" } },
+      { "type": "text", "id": "ok-8", "props": { "text": "正常8" } },
+      { "type": "text", "id": "ok-9", "props": { "text": "正常9" } },
+      { "type": "flying-toaster", "id": "bad", "props": { "wings": 2 } }
+    ]
+  }
+}

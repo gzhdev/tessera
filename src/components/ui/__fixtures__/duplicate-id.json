@@ -1,0 +1,12 @@
+{
+  "root": {
+    "type": "vstack", "id": "root", "props": {},
+    "children": [
+      { "type": "text", "id": "dup", "props": { "text": "第一次出现" } },
+      { "type": "hstack", "id": "mid", "props": {},
+        "children": [
+          { "type": "text", "id": "dup", "props": { "text": "第二次出现" } }
+        ] }
+    ]
+  }
+}

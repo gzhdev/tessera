@@ -1,0 +1,13 @@
+{
+  "root": {
+    "type": "switch",
+    "id": "sw",
+    "props": {
+      "label": "开关",
+      "on": false
+    },
+    "on": {
+      "change": "flip"
+    }
+  }
+}

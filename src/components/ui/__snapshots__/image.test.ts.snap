@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`image 组件 > 快照 1`] = `"<img class="ui-image" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="占位图" width="16">"`;

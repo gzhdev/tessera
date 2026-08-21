@@ -1,0 +1,23 @@
+{
+  "root": {
+    "type": "select",
+    "id": "sel",
+    "props": {
+      "options": [
+        {
+          "value": "a",
+          "label": "甲"
+        },
+        {
+          "value": "b",
+          "label": "乙"
+        }
+      ],
+      "value": "a",
+      "placeholder": "请选择"
+    },
+    "on": {
+      "change": "set-choice"
+    }
+  }
+}

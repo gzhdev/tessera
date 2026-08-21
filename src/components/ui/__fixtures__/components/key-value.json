@@ -1,0 +1,18 @@
+{
+  "root": {
+    "type": "key-value",
+    "id": "kv",
+    "props": {
+      "entries": [
+        {
+          "key": "版本",
+          "value": "1.0"
+        },
+        {
+          "key": "作者",
+          "value": "Tessera"
+        }
+      ]
+    }
+  }
+}

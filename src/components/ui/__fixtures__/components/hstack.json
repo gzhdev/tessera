@@ -1,0 +1,5 @@
+{ "root": { "type": "hstack", "id": "h", "props": { "gap": 6 },
+  "children": [
+    { "type": "button", "id": "x", "props": { "label": "确定" } },
+    { "type": "button", "id": "y", "props": { "label": "取消" } }
+  ] } }

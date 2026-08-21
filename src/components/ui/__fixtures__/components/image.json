@@ -1,0 +1,11 @@
+{
+  "root": {
+    "type": "image",
+    "id": "img",
+    "props": {
+      "source": "data:image/gif;base64,R0lGODlhAQABAAAAACw=",
+      "alt": "占位图",
+      "width": 16
+    }
+  }
+}

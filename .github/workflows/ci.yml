@@ -57,6 +57,29 @@ jobs:
       - name: 日志子系统无网络出口检查
         run: bash scripts/check-log-no-network.sh
 
+  frontend-checks:
+    name: 前端质量门禁（vue-tsc 类型检查 / Vitest 组件测试）
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: 安装 Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      # §17.1 约束 5：前端不本地修补生成类型——types/generated 由 Rust 侧
+      # gen-types 产出（rust-checks 已校验逐字节一致），此处直接消费。
+      - name: 类型检查（vue-tsc）
+        run: npx vue-tsc --noEmit
+
+      - name: 组件测试（Vitest，fixture 驱动）
+        run: npx vitest run
+
   toolchain-smoke:
     name: WASM Component Model 工具链冒烟
     runs-on: ubuntu-24.04
