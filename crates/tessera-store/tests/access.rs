@@ -146,6 +146,18 @@ fn permissions_and_vdirs_protection() {
         Err(StoreError::Rejected(_))
     ));
 
+    // 内置别名也不可经自建入口改写（upsert 的 builtin 保护与 delete 对称），
+    // 且被拒后原行原样保留
+    assert!(matches!(
+        tessera_store::vdirs::upsert(&pool, "temp", "D:/evil", true),
+        Err(StoreError::Rejected(_))
+    ));
+    let temp = tessera_store::vdirs::get(&pool, "temp")
+        .expect("查")
+        .expect("在");
+    assert_eq!(temp.real_path, "", "内置别名的映射不得被改写");
+    assert!(!temp.writable, "内置别名的 writable 不得被改写");
+
     tessera_store::vdirs::upsert(&pool, "my-project", "D:/work/project", true).expect("自建别名");
     let dir = tessera_store::vdirs::get(&pool, "my-project")
         .expect("查别名")

@@ -16,7 +16,9 @@ pub struct VirtualDir {
     pub builtin: bool,
 }
 
-/// 新增或更新用户自建别名（`builtin` 恒为 0，不提供写入内置别名的入口）。
+/// 新增或更新用户自建别名。撞上已有内置别名时被拒——单语句内原子完成：
+/// 条件更新的 `WHERE builtin = 0` 挡下内置行（影响行数为 0 即内置被撞），
+/// `builtin` 列自迁移种子后无任何写入路径。内置别名的映射更新走 [`set_real_path`]。
 pub fn upsert(
     pool: &DbPool,
     alias: &str,
@@ -24,12 +26,18 @@ pub fn upsert(
     writable: bool,
 ) -> Result<(), StoreError> {
     let conn = pool.get()?;
-    conn.execute(
+    let n = conn.execute(
         "INSERT INTO virtual_dirs (alias, real_path, writable, builtin)
          VALUES (?1, ?2, ?3, 0)
-         ON CONFLICT (alias) DO UPDATE SET real_path = excluded.real_path, writable = excluded.writable",
+         ON CONFLICT (alias) DO UPDATE SET real_path = excluded.real_path, writable = excluded.writable
+         WHERE virtual_dirs.builtin = 0",
         rusqlite::params![alias, real_path, writable as i64],
     )?;
+    if n == 0 {
+        return Err(StoreError::Rejected(format!(
+            "内置别名 {alias} 不可经自建入口改写"
+        )));
+    }
     Ok(())
 }
 
@@ -85,18 +93,19 @@ pub fn list(pool: &DbPool) -> Result<Vec<VirtualDir>, StoreError> {
 }
 
 /// 删除别名。内置别名（`builtin = 1`）被拒绝（§11.2 数据约束，D7）；
-/// 用户自建别名可自由删除。
+/// 用户自建别名可自由删除。保护与删除在同一条语句内原子完成，
+/// 随后的查询只为区分错误类别（不存在 / 受保护），不承担防护职责。
 pub fn delete(pool: &DbPool, alias: &str) -> Result<(), StoreError> {
+    let conn = pool.get()?;
+    let n = conn.execute(
+        "DELETE FROM virtual_dirs WHERE alias = ?1 AND builtin = 0",
+        rusqlite::params![alias],
+    )?;
+    if n > 0 {
+        return Ok(());
+    }
     match get(pool, alias)? {
         None => Err(StoreError::NotFound(format!("别名 {alias} 不存在"))),
-        Some(dir) if dir.builtin => Err(StoreError::Rejected(format!("内置别名 {alias} 不可删除"))),
-        Some(_) => {
-            let conn = pool.get()?;
-            conn.execute(
-                "DELETE FROM virtual_dirs WHERE alias = ?1",
-                rusqlite::params![alias],
-            )?;
-            Ok(())
-        }
+        Some(_) => Err(StoreError::Rejected(format!("内置别名 {alias} 不可删除"))),
     }
 }

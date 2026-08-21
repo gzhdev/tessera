@@ -189,6 +189,9 @@ fn downgrade_is_refused_without_touching_db() {
 }
 
 /// 1.5：重建入口删库重来；正常打开路径不删任何文件。
+///
+/// 「非开发模式下不可达」由 `rebuild` 上的 `#[cfg(debug_assertions)]` 门控保证
+/// （release 构建中符号不存在）；测试本身在 dev profile 编译运行，即门控下的可用形态。
 #[test]
 fn rebuild_is_a_separate_explicit_path() {
     let (_dir, path) = common::temp_db();

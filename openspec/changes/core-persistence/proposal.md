@@ -18,7 +18,7 @@
 - 配额计数（§11.5）：`plugin_storage` 的 16 MB / 10000 键 / 单值 1 MB；`__` 保留前缀的写入拒绝；`__picked/*` 的配额豁免与 `MAX_PICKED_ENTRIES` 淘汰
 - 内置虚拟目录别名（`plugin-data` / `workspace` / `temp`）的初始化与 `builtin` 标记保护
 
-**范围边界**：本 change 只做**存储层**。配置项的 schema 校验、前缀强制、`core/config-changed` 事件属于 `core-host-config`；`__picked/*` 的写入时机与 token 生成属于 `core-host-storage`。这里只保证「表存在、约束正确、读写可用、配额可查」。
+**范围边界**：本 change 只做**存储层**。配置项的 schema 校验、前缀强制、`core/config-changed` 事件属于 `core-host-config`；`__picked/*` 的写入时机与 token 生成属于 `core-host-storage`。这里只保证「表存在、约束正确、读写可用、配额可查」。另一项显式留给下游的责任：**插件停用时清除 `__picked/*` 的触发接线**归 `core-plugin-lifecycle`——存储层只提供 `clear_picked_entries` 能力，spec storage-quota 的该条 Requirement 由承接方落地（review.md 问题 5）。
 
 ## Capabilities
 

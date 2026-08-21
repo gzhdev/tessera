@@ -3,7 +3,7 @@
 //! 启动流程（[`run`]）：
 //! 1. 读 `schema_migrations` 最大版本（表不存在视为全新数据库，版本 0）
 //! 2. 数据库版本高于代码支持 → [`StoreError::SchemaNewerThanCode`]，拒绝启动且不做任何修改
-//! 3. 存在未应用迁移且数据库文件已存在 → 先 `VACUUM INTO` 备份为 `{db}.bak-{迁移前版本}`
+//! 3. 存在未应用迁移且数据库非全新（已含用户表）→ 先 `VACUUM INTO` 备份为 `{db}.bak-{迁移前版本}`
 //! 4. 逐条应用，每条在单个事务内完成（脚本 + 版本记录一起提交），失败整条回滚
 
 use std::path::{Path, PathBuf};
@@ -41,7 +41,7 @@ pub fn latest_version() -> i64 {
 pub struct Outcome {
     /// 本次实际应用的迁移版本，升序；空 = 数据库已是最新。
     pub applied: Vec<i64>,
-    /// 迁移前自动备份的文件路径；全新建库（无文件可备份）或无未应用迁移时为 `None`。
+    /// 迁移前自动备份的文件路径；全新数据库（尚无用户表，无内容可备份）或无未应用迁移时为 `None`。
     pub backup: Option<PathBuf>,
 }
 
@@ -157,24 +157,40 @@ fn backup_path(db: &Path, version: i64) -> PathBuf {
 
 /// 开发模式专用：删除数据库文件（含 WAL/SHM 旁文件）并从零应用全部迁移（design.md D4）。
 ///
+/// **仅在开发模式可用**（design.md D4 加粗要求）：本函数带
+/// `#[cfg(debug_assertions)]` 门控，release 构建中符号不存在，误引用在编译期
+/// 即失败——「非开发模式下不可达」由编译器保证，不依赖调用方自觉。
+///
 /// **显式且刺眼**：正常启动路径 [`crate::open`] / [`run`] 永远不会删除任何文件，
 /// 只有显式调用本函数才会。它存在的意义是让开发期「推倒重来」有正路可走，
 /// 从而没人去改已冻结的 `001_init.sql`——一旦数据库来自真实用户，这里删掉的就是用户数据。
+#[cfg(debug_assertions)]
 pub fn rebuild(path: &Path) -> Result<(DbPool, Outcome), StoreError> {
-    for suffix in ["", "-wal", "-shm"] {
-        let p = PathBuf::from(format!("{}{suffix}", path.display()));
-        match std::fs::remove_file(&p) {
-            Ok(()) => tracing::warn!(path = %p.display(), "重建数据库：已删除文件"),
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-            Err(e) => {
-                return Err(StoreError::db(
-                    "重建数据库：删除旧文件失败",
-                    format!("{}: {e}", p.display()),
-                ));
-            }
-        }
+    remove_db_file(path)?;
+    for suffix in ["-wal", "-shm"] {
+        // 旁文件路径用 OsString 无损拼接：display() 对非 UTF-8 路径有损转换，
+        // 病态路径下会把删除目标换成错误路径
+        let mut name = path.as_os_str().to_os_string();
+        name.push(suffix);
+        remove_db_file(&PathBuf::from(name))?;
     }
     let pool = crate::pool::open_pool(path, crate::pool::DEFAULT_MAX_POOL_SIZE)?;
     let outcome = run(path, &pool)?;
     Ok((pool, outcome))
+}
+
+/// 删除单个数据库文件；不存在视为已清理，其余错误报告为宿主数据库错误。
+#[cfg(debug_assertions)]
+fn remove_db_file(path: &Path) -> Result<(), StoreError> {
+    match std::fs::remove_file(path) {
+        Ok(()) => {
+            tracing::warn!(path = %path.display(), "重建数据库：已删除文件");
+            Ok(())
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(StoreError::db(
+            "重建数据库：删除旧文件失败",
+            format!("{}: {e}", path.display()),
+        )),
+    }
 }

@@ -275,19 +275,25 @@ pub fn usage(pool: &DbPool, plugin_id: &str) -> Result<StorageUsage, StoreError>
 /// 以实际数据重算计数器（排除保留命名空间），返回重算后的用量。
 /// 修复外部直接改库造成的计数漂移（D5 缓解措施）。
 pub fn recalc_usage(pool: &DbPool, plugin_id: &str) -> Result<StorageUsage, StoreError> {
-    let conn = pool.get()?;
-    recalc_on(&conn, plugin_id)
+    let mut conn = pool.get()?;
+    let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+    let usage = recalc_on(&tx, plugin_id)?;
+    tx.commit()?;
+    Ok(usage)
 }
 
 /// 用户手动清理某插件的私有存储：删除其全部普通键（保留命名空间归宿主管辖，
 /// 不随用户清理动作消失），并顺带重算计数器（spec storage-quota「手动清理释放配额」）。
+/// 删除与重算在同一事务内——中途崩溃不会留下「数据已删、计数虚高」的配额虚耗（D5）。
 pub fn clear_plugin_storage(pool: &DbPool, plugin_id: &str) -> Result<(), StoreError> {
-    let conn = pool.get()?;
-    conn.execute(
+    let mut conn = pool.get()?;
+    let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+    tx.execute(
         "DELETE FROM plugin_storage WHERE plugin_id = ?1 AND key NOT GLOB '__*'",
         rusqlite::params![plugin_id],
     )?;
-    recalc_on(&conn, plugin_id)?;
+    recalc_on(&tx, plugin_id)?;
+    tx.commit()?;
     Ok(())
 }
 
