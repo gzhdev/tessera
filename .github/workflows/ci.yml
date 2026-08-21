@@ -1,7 +1,7 @@
 # Tessera 持续集成（core-workspace-bootstrap 任务 3.3）
 #
 # 设计原则（design.md Non-Goals）：不追求完备性（覆盖率、跨平台矩阵），
-# 只要 fmt / clippy / test / 两条依赖方向检查 / 一个 WASM 组件往返冒烟。
+# 只要 fmt / clippy / test / schema 生成物一致性 / 两条依赖方向检查 / 一个 WASM 组件往返冒烟。
 name: CI
 
 on:

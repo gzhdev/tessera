@@ -12,9 +12,10 @@
 //!      提供 [`ValidationContext`] 的入参；
 //!   3. 顶层含 `"plugins"` 键：依赖图形态（`E_DEPS_*` 专用），每个元素是一个
 //!      图节点，喂给 [`DepGraph::resolve`]。
-//! - `valid/*/plugin.json`——wrapper 形态的正例；目录内的 `plugin.wasm`
-//!   是占位文件，满足步骤 6 的存在性检查。全部正例必须零错误通过；
+//! - `valid/*/plugin.json`——wrapper 形态的正例；全部正例必须零错误通过；
 //!   `full-example`（设计书 §4.1）与 `permissions-all-8` 还必须零警告。
+//!   `main` 存在性检查所需的占位 `plugin.wasm` 由测试 harness 在临时目录
+//!   统一提供（见 [`temp_plugin_dir`]），fixture 目录只含 JSON。
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;

@@ -117,20 +117,25 @@ impl Permission {
     }
 
     /// scope 的规范化串（type + scope 值），用于「同一 type 与 scope 不得重复」检查。
+    ///
+    /// 列表型 scope（域名 / topic / 目标）按**集合**语义比较：排序去重后再拼接，
+    /// `["a","b"]` 与 `["b","a"]` 视为同一 scope（review.md #6）。
     pub fn scope_key(&self) -> String {
-        let scope = match self {
+        let mut scope: Vec<String> = match self {
             Permission::FsRead { virtual_dir } | Permission::FsWrite { virtual_dir } => {
-                virtual_dir.clone()
+                vec![virtual_dir.clone()]
             }
             Permission::NetHttp { allowed_domains }
             | Permission::NetInsecure { allowed_domains }
-            | Permission::NetPrivate { allowed_domains } => allowed_domains.join(","),
+            | Permission::NetPrivate { allowed_domains } => allowed_domains.clone(),
             Permission::EventsPublish { topics } | Permission::EventsSubscribe { topics } => {
-                topics.join(",")
+                topics.clone()
             }
-            Permission::CommandInvoke { targets } => targets.join(","),
+            Permission::CommandInvoke { targets } => targets.clone(),
         };
-        format!("{}|{}", self.type_name(), scope)
+        scope.sort();
+        scope.dedup();
+        format!("{}|{}", self.type_name(), scope.join(","))
     }
 
     /// 引用的全部虚拟目录别名（步骤 10 存在性检查的输入）。
@@ -150,10 +155,11 @@ impl Permission {
 
 /// 激活事件。`onConfig:{key}` 已在 v0.3 移除（§3.4）。
 ///
-/// JSON 表示是 §3.4 语法的字符串，`JsonSchema` 由 [`crate::schema`] 手写
-/// （derive 会按 Rust enum 形状生成错误的 object schema）。
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "camelCase")]
+/// JSON 表示是 §3.4 语法的字符串：`Deserialize` 与 `Serialize` 均为手写
+/// （derive 会按 Rust enum 形状生成错误的 object schema 与不对称的
+/// externally tagged 序列化，见 review.md #4）；`JsonSchema` 由
+/// [`crate::schema`] 手写。
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ActivationEvent {
     /// `onCommand:{command_id}`：该命令被调用。id 可为局部名或全限定名。
     OnCommand { command: String },
@@ -221,6 +227,13 @@ impl<'de> Deserialize<'de> for ActivationEvent {
     fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
         let raw = String::deserialize(d)?;
         Self::parse(&raw).map_err(serde::de::Error::custom)
+    }
+}
+
+// 序列化为 §3.4 语法的字符串，与 Deserialize 对称（round-trip 稳定）
+impl Serialize for ActivationEvent {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(&self.to_raw())
     }
 }
 
@@ -592,5 +605,37 @@ mod tests {
             let ty: ConfigType = serde_json::from_str(json).unwrap();
             assert_eq!(ty, expected);
         }
+    }
+
+    /// review.md #4：`ActivationEvent` 序列化为 §3.4 语法字符串，
+    /// 与反序列化对称（serialize → deserialize round-trip 相等）。
+    #[test]
+    fn activation_event_serde_round_trip() {
+        for raw in [
+            "onCommand:run",
+            "onView:com.example.myplugin.panel",
+            "onEvent:core/config-changed",
+            "onStartup",
+            "*",
+        ] {
+            let event: ActivationEvent =
+                serde_json::from_str(&serde_json::to_string(raw).unwrap()).unwrap();
+            let serialized = serde_json::to_string(&event).unwrap();
+            assert_eq!(serialized, serde_json::to_string(raw).unwrap());
+            let back: ActivationEvent = serde_json::from_str(&serialized).unwrap();
+            assert_eq!(back, event, "{raw}");
+        }
+    }
+
+    /// review.md #6：scope 查重按集合语义——域名顺序不同不算新 scope。
+    #[test]
+    fn scope_key_is_order_insensitive() {
+        let a: Permission =
+            serde_json::from_str(r#"{ "type": "net.http", "allowedDomains": ["a.com", "b.com"] }"#)
+                .unwrap();
+        let b: Permission =
+            serde_json::from_str(r#"{ "type": "net.http", "allowedDomains": ["b.com", "a.com"] }"#)
+                .unwrap();
+        assert_eq!(a.scope_key(), b.scope_key());
     }
 }

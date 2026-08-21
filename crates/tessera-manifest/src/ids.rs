@@ -94,9 +94,13 @@ impl std::fmt::Display for LocalName {
 
 /// 全限定贡献项标识：`{plugin_id}.{local_name}`。
 ///
-/// 只能经 [`PluginId::qualify`]（本 crate 内拼接）或 [`QualifiedId::parse`]
-/// （外部已占用 id 的反序列化，格式必须能拆回合法的插件 id + 局部名）产生。
-/// 把裸局部名当全限定名传入 `parse` 会因拆不出插件 id 段而失败。
+/// 注意：这个字符串形式在多段局部名（§6.2 允许，如 `tools.format`）时
+/// **本质歧义**——`com.example.tools.format` 的 owner 既可能是
+/// `com.example` 也可能是 `com.example.tools`，字符串层面无法判定。
+/// 因此本类型不提供无歧义前提的 `split`；拆解一律走
+/// [`QualifiedId::strip_plugin_prefix`]，由调用方提供已知插件 id 消歧
+/// （注册表场景天然持有该信息）。把裸局部名当全限定名传入 `parse`
+/// 会因拆不出插件 id 段而失败。
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize)]
 pub struct QualifiedId(String);
 
@@ -114,13 +118,18 @@ impl QualifiedId {
         &self.0
     }
 
-    /// 拆解为（插件 id，局部名）。
-    pub fn split(&self) -> (PluginId, LocalName) {
-        let (head, tail) = self.0.rsplit_once('.').expect("parse 已保证含点分隔");
-        (
-            PluginId::parse(head).expect("parse 已保证插件 id 段合法"),
-            LocalName::parse(tail).expect("parse 已保证局部名段合法"),
-        )
+    /// 按给定插件 id 的视角拆解：若本串以 `{plugin_id}.` 开头且剩余部分是
+    /// 合法局部名，返回该局部名；否则返回 `None`。
+    ///
+    /// 这是拆解全限定名的**唯一**入口。注意歧义的准确语义：多段局部名时
+    /// 同一个串在**不同** owner 视角下可能都拆得开（`com.example.tools.format`
+    /// 按 `com.example` 拆得 `tools.format`，按 `com.example.tools` 拆得
+    /// `format`），但各自给出的局部名不同——用注册时的 owner 拆解必然还原
+    /// 出注册时的局部名（`qualify` → `strip_plugin_prefix` 无损往返），
+    /// 用错误 owner 拆出的局部名在对方注册表中查不到，不会被静默误读。
+    pub fn strip_plugin_prefix(&self, plugin_id: &PluginId) -> Option<LocalName> {
+        let rest = self.0.strip_prefix(&format!("{plugin_id}."))?;
+        LocalName::parse(rest)
     }
 }
 
@@ -225,14 +234,44 @@ mod tests {
         assert!(QualifiedId::parse("run.open").is_none());
     }
 
-    /// 全限定名可无损拆回（插件 id, 局部名）。
+    /// 全限定名以已知插件 id 消歧后可无损拆回（review.md #1）：
+    /// 单段与多段局部名（§6.2 允许点分多段）都必须往返一致。
     #[test]
-    fn qualified_id_round_trip() {
+    fn qualified_id_round_trip_with_known_owner() {
         let plugin = PluginId::parse("com.example.myplugin").unwrap();
-        let local = LocalName::parse("run").unwrap();
-        let (pid, lname) = plugin.qualify(&local).split();
-        assert_eq!(pid, plugin);
-        assert_eq!(lname, local);
+        for local in ["run", "tools.format", "Tools.Format"] {
+            let local = LocalName::parse(local).unwrap();
+            let qualified = plugin.qualify(&local);
+            // 注册 owner 视角下无损还原（单段与多段局部名一致）
+            assert_eq!(
+                qualified.strip_plugin_prefix(&plugin).as_ref(),
+                Some(&local)
+            );
+            // 完全无关的 owner 剥不出前缀
+            let unrelated = PluginId::parse("org.other.plugin").unwrap();
+            assert!(qualified.strip_plugin_prefix(&unrelated).is_none());
+        }
+    }
+
+    /// 多段局部名的 owner 歧义以字符串形式存在（`parse` 只做格式校验），
+    /// 消歧由 `strip_plugin_prefix` 的 owner 入参承担——这正是删除 `split`
+    /// 的原因：无 owner 前提的拆解在本类型上不可能正确。
+    #[test]
+    fn multi_segment_local_name_owner_disambiguation() {
+        let owner = PluginId::parse("com.example").unwrap();
+        let qualified = owner.qualify(&LocalName::parse("tools.format").unwrap());
+        // 正确 owner 还原出原局部名
+        assert_eq!(
+            qualified.strip_plugin_prefix(&owner).unwrap().as_str(),
+            "tools.format"
+        );
+        // 错误 owner 也剥得开（歧义的本质），但给出的局部名不同——
+        // `format` 不在 owner 的注册表里，不会被静默误读
+        let wrong = PluginId::parse("com.example.tools").unwrap();
+        assert_eq!(
+            qualified.strip_plugin_prefix(&wrong).unwrap().as_str(),
+            "format"
+        );
     }
 
     #[test]

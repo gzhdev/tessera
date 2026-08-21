@@ -40,7 +40,7 @@
 
 **新增依赖**
 
-- `serde` / `serde_json`、`schemars`、`semver`
+- `serde` / `serde_json`、`schemars`、`semver`、`serde_path_to_error`（为 serde 错误信息提供 JSON 路径前缀，落实「哪个上下文中的哪个未知字段」的定位要求）
 
 **下游影响**
 

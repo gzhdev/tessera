@@ -130,7 +130,7 @@ pub fn validate(
         return Err(TesseraError::new(
             ErrorCode::Manifest(codes::ManifestCode::Version),
             format!(
-                "此清单的 manifestVersion 为 {}，当前宿主仅支持 1，请更新插件",
+                "此清单的 manifestVersion 为 {}，当前宿主仅支持 1，请升级应用",
                 manifest.manifest_version
             ),
         ));
@@ -299,13 +299,21 @@ fn check_activation_events(
             }
             _ => continue,
         };
-        // 解析为本插件局部名的三种形态；其余视为外部全限定引用，放行
+        // 引用解析（§4.2，review.md #2）：按序判定——
+        //   1. 带本插件 id 前缀 → 剥前缀得到局部名（含多段局部名）；
+        //   2. 头部（最后一个点之前）是合法插件 id 形态 → 外部全限定引用，放行
+        //      （跨插件引用存在性归编排层）；
+        //   3. 其余（不含点，或头部不可能是插件 id——如 `tools.format` 头段
+        //      单段、`Tools.Format` 头段含大写）→ 只能是本插件局部名，查表。
+        let head_is_plugin_id = id
+            .rsplit_once('.')
+            .is_some_and(|(head, _)| PluginId::parse(head).is_some());
         let local = if let Some(rest) = id.strip_prefix(&own_prefix) {
             Some(rest)
-        } else if !id.contains('.') {
-            Some(id)
-        } else {
+        } else if head_is_plugin_id {
             None
+        } else {
+            Some(id)
         };
         if let Some(local) = local
             && !known.contains(local)
@@ -669,6 +677,39 @@ mod tests {
         json["activationEvents"] = serde_json::json!(["onView:com.example.myplugin.noview"]);
         let err = run(&json).unwrap_err();
         assert_eq!(code_of(&err), "E_MANIFEST_DANGLING_REF");
+    }
+
+    /// review.md #2：多段局部名（头部不是合法插件 id 形态）只能指本插件，
+    /// 查不到即悬空——原先被当作外部引用漏检。
+    #[test]
+    fn step9_multi_segment_local_name_dangling_detected() {
+        let mut json = base_json();
+        json["activationEvents"] = serde_json::json!(["onCommand:tools.format"]);
+        let err = run(&json).unwrap_err();
+        assert_eq!(code_of(&err), "E_MANIFEST_DANGLING_REF");
+        assert!(
+            err.user_message.contains("tools.format"),
+            "{}",
+            err.user_message
+        );
+
+        // 大写多段局部名同理（头部含大写不可能是插件 id）
+        let mut upper = base_json();
+        upper["activationEvents"] = serde_json::json!(["onCommand:Tools.Format"]);
+        assert_eq!(
+            code_of(&run(&upper).unwrap_err()),
+            "E_MANIFEST_DANGLING_REF"
+        );
+    }
+
+    /// review.md #2 对照：contributes 中确实存在的多段局部名命令，引用通过。
+    #[test]
+    fn step9_existing_multi_segment_local_reference_passes() {
+        let mut json = base_json();
+        json["contributes"]["commands"] =
+            serde_json::json!([{ "id": "tools.format", "title": "格式化" }]);
+        json["activationEvents"] = serde_json::json!(["onCommand:tools.format"]);
+        run(&json).expect("已存在的多段局部名命令必须通过");
     }
 
     #[test]
